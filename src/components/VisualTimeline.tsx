@@ -136,7 +136,7 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
         }}
         title={hasInjection ? `Day ${day}: ${dose}mg` : `Day ${day}: Click to add injection`}
       >
-        {hasInjection ? dose?.toFixed(1) : day % 7 === 0 ? day : ''}
+        {hasInjection ? dose : day % 7 === 0 ? day : ''}
       </div>
     );
   };
