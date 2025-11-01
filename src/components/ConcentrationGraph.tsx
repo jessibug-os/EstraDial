@@ -166,13 +166,13 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({ data, viewDays,
             top: 20,
             right: 30,
             left: 20,
-            bottom: 20,
+            bottom: 30,
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="time"
-            label={{ value: 'Time (days)', position: 'insideBottom', offset: -10 }}
+            label={{ value: 'Time (days)', position: 'insideBottom', offset: -5 }}
             ticks={generateXTicks(viewDays)}
             domain={[0, viewDays]}
           />
