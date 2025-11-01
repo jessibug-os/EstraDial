@@ -22,6 +22,7 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
 }) => {
   const [selectedDose, setSelectedDose] = useState<number | null>(null);
   const [scheduleInputValue, setScheduleInputValue] = useState(viewDays.toString());
+  const [showResetModal, setShowResetModal] = useState(false);
 
   // Sync local input state with prop changes
   useEffect(() => {
@@ -150,9 +151,145 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <div style={{ fontSize: '14px', color: '#6c757d' }}>
-            <strong style={{ color: '#495057' }}>{doses.length} injections</strong>
-            {doses.length > 0 && ` (${Math.min(...doses.map(d => d.day))}-${Math.max(...doses.map(d => d.day))}d)`}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ fontSize: '14px', color: '#6c757d' }}>
+              <strong style={{ color: '#495057' }}>{doses.length} injections</strong>
+              {doses.length > 0 && ` (${Math.min(...doses.map(d => d.day))}-${Math.max(...doses.map(d => d.day))}d)`}
+            </div>
+            {doses.length > 0 && (
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={() => setShowResetModal(true)}
+                  style={{
+                    padding: '3px 8px',
+                    fontSize: '12px',
+                    color: '#dc3545',
+                    backgroundColor: 'transparent',
+                    border: '1px solid #dc3545',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = '#dc3545';
+                    e.currentTarget.style.color = 'white';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = '#dc3545';
+                  }}
+                >
+                  Reset
+                </button>
+
+                {/* Reset Confirmation Popover */}
+                {showResetModal && (
+                  <>
+                    <div
+                      style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        zIndex: 999
+                      }}
+                      onClick={() => setShowResetModal(false)}
+                    />
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '100%',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        marginTop: '8px',
+                        backgroundColor: 'white',
+                        padding: '16px',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                        width: '280px',
+                        zIndex: 1000,
+                        border: '1px solid #dee2e6'
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {/* Arrow */}
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '-6px',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          width: 0,
+                          height: 0,
+                          borderLeft: '6px solid transparent',
+                          borderRight: '6px solid transparent',
+                          borderBottom: '6px solid #dee2e6'
+                        }}
+                      />
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '-5px',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          width: 0,
+                          height: 0,
+                          borderLeft: '6px solid transparent',
+                          borderRight: '6px solid transparent',
+                          borderBottom: '6px solid white'
+                        }}
+                      />
+
+                      <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>
+                        Clear all injections?
+                      </div>
+                      <div style={{ fontSize: '13px', color: '#6c757d', marginBottom: '16px' }}>
+                        This will remove all {doses.length} injection{doses.length !== 1 ? 's' : ''}.
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                          onClick={() => setShowResetModal(false)}
+                          style={{
+                            flex: 1,
+                            padding: '8px',
+                            backgroundColor: '#f8f9fa',
+                            color: '#495057',
+                            border: '1px solid #dee2e6',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '13px',
+                            fontWeight: '500'
+                          }}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={() => {
+                            onDosesChange([]);
+                            setSelectedDose(null);
+                            setShowResetModal(false);
+                          }}
+                          style={{
+                            flex: 1,
+                            padding: '8px',
+                            backgroundColor: '#dc3545',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '13px',
+                            fontWeight: '500'
+                          }}
+                        >
+                          Clear All
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
