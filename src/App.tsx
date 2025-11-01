@@ -1,37 +1,39 @@
 import { useState, useEffect } from 'react';
 import './App.css';
-import { DEFAULT_DOSES, Dose, ESTRADIOL_ESTERS } from './data/estradiolEsters';
+import { DEFAULT_DOSES, Dose } from './data/estradiolEsters';
 import {
   calculateTotalConcentration,
   generateTimePoints,
   ConcentrationPoint
 } from './utils/pharmacokinetics';
+import { ReferenceCycleType } from './data/referenceData';
+import { encodeSchedule, decodeSchedule, decodeLegacySchedule } from './utils/urlEncoding';
 import VisualTimeline from './components/VisualTimeline';
 import ConcentrationGraph from './components/ConcentrationGraph';
 
 function App() {
   // Load from URL or use defaults
-  const loadFromURL = (): { doses: Dose[], scheduleLength: number, graphDays: number, repeat: boolean } => {
+  const loadFromURL = (): {
+    doses: Dose[],
+    scheduleLength: number,
+    graphDays: number,
+    repeat: boolean,
+    cycleType: ReferenceCycleType
+  } => {
     const params = new URLSearchParams(window.location.search);
     const scheduleData = params.get('s');
 
     if (scheduleData) {
-      try {
-        // Format: [[day,dose,esterIndex],...],scheduleLength,graphDays,repeat
-        const decoded = JSON.parse(atob(scheduleData));
-        const doses = decoded[0].map((d: any) => ({
-          day: d[0],
-          dose: d[1],
-          ester: ESTRADIOL_ESTERS[d[2]] || ESTRADIOL_ESTERS[1]
-        }));
-        return {
-          doses,
-          scheduleLength: decoded[1] || 29,
-          graphDays: decoded[2] || 90,
-          repeat: decoded[3] || false
-        };
-      } catch (e) {
-        console.error('Failed to parse URL schedule', e);
+      // Try new compact format first
+      let decoded = decodeSchedule(scheduleData);
+
+      // Fall back to legacy format for backwards compatibility
+      if (!decoded) {
+        decoded = decodeLegacySchedule(scheduleData);
+      }
+
+      if (decoded) {
+        return decoded;
       }
     }
 
@@ -39,7 +41,8 @@ function App() {
       doses: DEFAULT_DOSES,
       scheduleLength: 29,
       graphDays: 90,
-      repeat: true
+      repeat: true,
+      cycleType: 'typical'
     };
   };
 
@@ -49,25 +52,21 @@ function App() {
   const [scheduleLength, setScheduleLength] = useState(initial.scheduleLength);
   const [graphDisplayDays, setGraphDisplayDays] = useState(initial.graphDays);
   const [repeatSchedule, setRepeatSchedule] = useState(initial.repeat);
+  const [referenceCycleType, setReferenceCycleType] = useState<ReferenceCycleType>(initial.cycleType);
 
   // Update URL when schedule changes
   useEffect(() => {
-    // Format: [[day,dose,esterIndex],...],scheduleLength,graphDays,repeat
-    const scheduleData = [
-      doses.map(d => [
-        d.day,
-        d.dose,
-        ESTRADIOL_ESTERS.findIndex(e => e.name === d.ester.name)
-      ]),
+    const encoded = encodeSchedule({
+      doses,
       scheduleLength,
-      graphDisplayDays,
-      repeatSchedule
-    ];
+      graphDays: graphDisplayDays,
+      repeat: repeatSchedule,
+      cycleType: referenceCycleType
+    });
 
-    const encoded = btoa(JSON.stringify(scheduleData));
     const newURL = `${window.location.pathname}?s=${encoded}`;
     window.history.replaceState({}, '', newURL);
-  }, [doses, scheduleLength, graphDisplayDays, repeatSchedule]);
+  }, [doses, scheduleLength, graphDisplayDays, repeatSchedule, referenceCycleType]);
 
   useEffect(() => {
     // Create the dose array for calculation, repeating if needed
@@ -117,6 +116,8 @@ function App() {
         data={concentrationData}
         viewDays={graphDisplayDays}
         onViewDaysChange={setGraphDisplayDays}
+        referenceCycleType={referenceCycleType}
+        onReferenceCycleTypeChange={setReferenceCycleType}
       />
 
       <footer style={{ marginTop: '40px', textAlign: 'center', color: '#666', fontSize: '14px' }}>

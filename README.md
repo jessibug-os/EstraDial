@@ -14,7 +14,11 @@
 
 Calculate and visualize estradiol concentrations over time based on your injection schedule. Click days to add doses, pick esters, see projected levels on a graph.
 
-Reference line based on [PMC8042396](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8042396/) - median estradiol levels from 23 cis women across menstrual cycles.
+**Multiple reference cycles available:**
+- **Typical Cycle** - Median levels from 23 cis women ([PMC8042396](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8042396/))
+- **HRT Target Ranges** - Natural cycle equivalent targets for HRT (Transfeminine Science)
+- **Conservative Range** - Lower bound (5th percentile) of natural variation
+- **High Physiological** - Upper bound (95th percentile) of natural variation
 
 **Supported esters:** Benzoate, Valerate, Cypionate, Enanthate, Undecylate, Polyestradiol Phosphate
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dose, ESTRADIOL_ESTERS } from '../data/estradiolEsters';
+import { PRESETS } from '../data/presets';
 
 interface VisualTimelineProps {
   doses: Dose[];
@@ -23,6 +24,7 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
   const [selectedDose, setSelectedDose] = useState<number | null>(null);
   const [scheduleInputValue, setScheduleInputValue] = useState(viewDays.toString());
   const [showResetModal, setShowResetModal] = useState(false);
+  const [showPresetsMenu, setShowPresetsMenu] = useState(false);
   const [previousViewDays, setPreviousViewDays] = useState(viewDays);
   const [editingDose, setEditingDose] = useState<number | null>(null);
   const [editingValue, setEditingValue] = useState<string>('');
@@ -293,10 +295,95 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
               <strong style={{ color: '#495057' }}>{doses.length} injection{doses.length !== 1 ? 's' : ''}</strong>
               {getDosageDisplayText()}
             </div>
-            {doses.length > 0 && (
+            <div style={{ display: 'flex', gap: '8px' }}>
               <div style={{ position: 'relative' }}>
                 <button
-                  onClick={() => setShowResetModal(true)}
+                  onClick={() => setShowPresetsMenu(!showPresetsMenu)}
+                  style={{
+                    padding: '4px 10px',
+                    fontSize: '12px',
+                    backgroundColor: '#6c757d',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontWeight: '500',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5a6268'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6c757d'}
+                >
+                  Load Preset ▼
+                </button>
+                {showPresetsMenu && (
+                  <>
+                    <div
+                      style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        zIndex: 999
+                      }}
+                      onClick={() => setShowPresetsMenu(false)}
+                    />
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '100%',
+                        left: 0,
+                        marginTop: '4px',
+                        backgroundColor: 'white',
+                        border: '1px solid #dee2e6',
+                        borderRadius: '6px',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                        zIndex: 1000,
+                        minWidth: '280px',
+                        maxHeight: '400px',
+                        overflowY: 'auto'
+                      }}
+                    >
+                      {PRESETS.map(preset => (
+                        <button
+                          key={preset.id}
+                          onClick={() => {
+                            onDosesChange(preset.doses);
+                            onViewDaysChange(preset.scheduleLength);
+                            onRepeatScheduleChange(preset.repeat ?? true);
+                            setShowPresetsMenu(false);
+                            setSelectedDose(null);
+                          }}
+                          style={{
+                            width: '100%',
+                            padding: '10px 14px',
+                            textAlign: 'left',
+                            border: 'none',
+                            borderBottom: '1px solid #f0f0f0',
+                            backgroundColor: 'white',
+                            cursor: 'pointer',
+                            fontSize: '13px',
+                            transition: 'background-color 0.15s'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
+                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                        >
+                          <div style={{ fontWeight: '600', color: '#212529', marginBottom: '2px' }}>
+                            {preset.name}
+                          </div>
+                          <div style={{ fontSize: '11px', color: '#6c757d' }}>
+                            {preset.description}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+              {doses.length > 0 && (
+                <div style={{ position: 'relative' }}>
+                  <button
+                    onClick={() => setShowResetModal(true)}
                   style={{
                     padding: '3px 8px',
                     fontSize: '12px',
@@ -426,7 +513,8 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
                   </>
                 )}
               </div>
-            )}
+              )}
+            </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>

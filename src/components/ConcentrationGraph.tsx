@@ -10,15 +10,23 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import { ConcentrationPoint } from '../utils/pharmacokinetics';
-import { generateReferenceCycle } from '../data/referenceData';
+import { generateReferenceCycle, ReferenceCycleType, REFERENCE_CYCLES } from '../data/referenceData';
 
 interface ConcentrationGraphProps {
   data: ConcentrationPoint[];
   viewDays: number;
   onViewDaysChange: (days: number) => void;
+  referenceCycleType: ReferenceCycleType;
+  onReferenceCycleTypeChange: (type: ReferenceCycleType) => void;
 }
 
-const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({ data, viewDays, onViewDaysChange }) => {
+const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({
+  data,
+  viewDays,
+  onViewDaysChange,
+  referenceCycleType,
+  onReferenceCycleTypeChange
+}) => {
   const [graphInputValue, setGraphInputValue] = useState(viewDays.toString());
 
   // Sync local input state with prop changes
@@ -50,13 +58,15 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({ data, viewDays,
     }
   };
 
+  const currentCycleInfo = REFERENCE_CYCLES.find(c => c.id === referenceCycleType);
+
   const formatTooltip = (value: any, name: string) => {
     if (name === 'concentration') {
       const numValue = parseFloat(value);
       return [`${formatNumber(numValue)} pg/mL`, 'Estradiol Ester'];
     } else if (name === 'reference') {
       const numValue = parseFloat(value);
-      return [`${formatNumber(numValue)} pg/mL`, 'Cis Women Cycle'];
+      return [`${formatNumber(numValue)} pg/mL`, currentCycleInfo?.name || 'Reference Cycle'];
     }
     return [value, name];
   };
@@ -66,7 +76,7 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({ data, viewDays,
   };
 
   // Generate reference cycle data
-  const referenceData = generateReferenceCycle(viewDays);
+  const referenceData = generateReferenceCycle(viewDays, referenceCycleType);
 
   // Filter and combine data for the chart based on viewDays
   const filteredData = data.filter(point => point.time <= viewDays);
@@ -126,38 +136,75 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({ data, viewDays,
 
   return (
     <div style={{ marginTop: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '10px' }}>
         <h3 style={{ margin: 0 }}>Estradiol Concentration Over Time</h3>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <label style={{ fontSize: '13px', color: '#6c757d' }}>
-            Display:
-          </label>
-          <input
-            type="number"
-            value={graphInputValue}
-            onChange={(e) => {
-              const val = e.target.value;
-              setGraphInputValue(val); // Only update local state, debounce handles propagation
-            }}
-            onBlur={(e) => {
-              const val = e.target.value;
-              if (val === '' || parseInt(val) < 1 || isNaN(parseInt(val))) {
-                setGraphInputValue('1');
-                onViewDaysChange(1);
-              }
-            }}
-            min="1"
-            style={{
-              width: '60px',
-              padding: '4px 6px',
-              fontSize: '13px',
-              borderRadius: '4px',
-              border: '1px solid #ccc'
-            }}
-          />
-          <span style={{ fontSize: '13px', color: '#6c757d' }}>days</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <label style={{ fontSize: '13px', color: '#6c757d' }}>
+              Reference:
+            </label>
+            <select
+              value={referenceCycleType}
+              onChange={(e) => onReferenceCycleTypeChange(e.target.value as ReferenceCycleType)}
+              style={{
+                padding: '4px 6px',
+                fontSize: '13px',
+                borderRadius: '4px',
+                border: '1px solid #ccc',
+                backgroundColor: 'white',
+                cursor: 'pointer'
+              }}
+              title={currentCycleInfo?.description}
+            >
+              {REFERENCE_CYCLES.map(cycle => (
+                <option key={cycle.id} value={cycle.id}>
+                  {cycle.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <label style={{ fontSize: '13px', color: '#6c757d' }}>
+              Display:
+            </label>
+            <input
+              type="number"
+              value={graphInputValue}
+              onChange={(e) => {
+                const val = e.target.value;
+                setGraphInputValue(val); // Only update local state, debounce handles propagation
+              }}
+              onBlur={(e) => {
+                const val = e.target.value;
+                if (val === '' || parseInt(val) < 1 || isNaN(parseInt(val))) {
+                  setGraphInputValue('1');
+                  onViewDaysChange(1);
+                }
+              }}
+              min="1"
+              style={{
+                width: '60px',
+                padding: '4px 6px',
+                fontSize: '13px',
+                borderRadius: '4px',
+                border: '1px solid #ccc'
+              }}
+            />
+            <span style={{ fontSize: '13px', color: '#6c757d' }}>days</span>
+          </div>
         </div>
       </div>
+
+      {currentCycleInfo && (
+        <div style={{
+          fontSize: '12px',
+          color: '#666',
+          marginBottom: '10px',
+          fontStyle: 'italic'
+        }}>
+          {currentCycleInfo.description} — Source: {currentCycleInfo.source}
+        </div>
+      )}
       
       <ResponsiveContainer width="100%" height={400}>
         <LineChart
@@ -196,14 +243,14 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({ data, viewDays,
             dot={false}
             name="Estradiol Ester"
           />
-          <Line 
-            type="monotone" 
-            dataKey="reference" 
-            stroke="#ff7300" 
+          <Line
+            type="monotone"
+            dataKey="reference"
+            stroke="#ff7300"
             strokeWidth={2}
             dot={false}
             strokeDasharray="5 5"
-            name="Reference Cycle"
+            name={currentCycleInfo?.name || "Reference Cycle"}
           />
         </LineChart>
       </ResponsiveContainer>
@@ -213,7 +260,7 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({ data, viewDays,
           <strong>Peak ester concentration (displayed range):</strong> {formatNumber(Math.max(...filteredData.map(d => d.concentration)))} pg/mL
         </p>
         <p>
-          <strong>Cis women cycle range:</strong> 45-350 pg/mL (typical follicular-ovulatory range)
+          <strong>Reference cycle range:</strong> {formatNumber(Math.min(...referenceData.map(d => d.estradiol)))}-{formatNumber(Math.max(...referenceData.map(d => d.estradiol)))} pg/mL
         </p>
         <p>
           <strong>Displayed time range:</strong> {filteredData[0]?.time || 0} - {viewDays} days
