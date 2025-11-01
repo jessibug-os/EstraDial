@@ -172,7 +172,7 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({ data, viewDays,
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="time"
-            label={{ value: 'Time (days)', position: 'insideBottom', offset: -5 }}
+            label={{ value: 'Time (days)', position: 'insideBottom' }}
             ticks={generateXTicks(viewDays)}
             domain={[0, viewDays]}
           />
@@ -187,6 +187,7 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({ data, viewDays,
             labelFormatter={(value) => `Day ${value}`}
           />
           <Legend />
+
           <Line
             type="monotone"
             dataKey="concentration"
@@ -202,7 +203,7 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({ data, viewDays,
             strokeWidth={2}
             dot={false}
             strokeDasharray="5 5"
-            name="Cis Women Cycle"
+            name="Reference Cycle"
           />
         </LineChart>
       </ResponsiveContainer>
