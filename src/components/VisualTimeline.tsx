@@ -374,7 +374,7 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
         border: `1px solid ${selectedDoseData ? '#ffeaa7' : '#dee2e6'}`,
         borderRadius: '8px',
         boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-        height: '400px',
+        height: '454px',
         overflowY: 'auto',
         display: 'flex',
         flexDirection: 'column'
