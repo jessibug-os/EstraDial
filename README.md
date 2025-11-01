@@ -1,112 +1,68 @@
-# 💉 EstraDial
+# EstraDial
 
-> A friendly pharmacokinetic calculator for visualizing estradiol ester concentrations over time ✨
+A tool for visualizing estradiol ester concentrations over time based on your injection schedule.
 
-[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen?style=for-the-badge)](https://jessibug-os.github.io/EstraDial)
-[![React](https://img.shields.io/badge/React-19.2-61dafb?style=for-the-badge&logo=react)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-4.9-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+**[Live demo](https://jessibug-os.github.io/EstraDial)**
 
----
+## What does this do?
 
-## 🌸 What is this?
+If you're doing estradiol injections, you've probably wondered what your levels look like between doses. This calculator uses pharmacokinetic models to show you exactly that. You can:
 
-EstraDial helps you calculate and visualize how estradiol concentration changes in your body over time based on your injection schedule. It uses real pharmacokinetic models to show you what's happening between doses!
+- Add injections by clicking on a calendar
+- Pick different esters for each dose (valerate, cypionate, enanthate, etc.)
+- See a graph of your levels over time
+- Compare against a reference menstrual cycle
+- Repeat your schedule to visualize steady-state levels
 
-### ✨ Features
-
-- 📊 **Interactive Graph** - See your estradiol levels over time with a beautiful chart
-- 📅 **Visual Calendar** - Click-to-add injection scheduling (so much better than typing!)
-- 💊 **7 Different Esters** - Choose from valerate, cypionate, enanthate, and more
-- 🔄 **Schedule Repetition** - Automatically repeat your cycle to see steady-state levels
-- 🌊 **Reference Cycle** - Compare against cis women's natural menstrual cycle
-- 🎨 **Per-Dose Customization** - Mix and match different esters in the same schedule
-
----
-
-## 🚀 Quick Start
-
-**[Try it live here!](https://jessibug-os.github.io/EstraDial)** No installation needed! 💝
-
-Or run it locally:
+## Running locally
 
 ```bash
 npm install
 npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) and start planning! 🎉
+Then open http://localhost:3000
 
----
+## How it works
 
-## 🎯 How to Use
+The calculator uses a three-compartment pharmacokinetic model with parameters specific to each ester type. Basically it takes the dose, ester type, and time since injection, runs it through some exponential decay math, and gives you an estimated concentration.
 
-1. **Click on days** in the calendar to add injections
-2. **Click existing injections** to edit dose amount and ester type
-3. **Adjust the schedule length** to match your cycle
-4. **Toggle "Repeat"** to see what steady-state levels look like
-5. **Watch the graph** update in real-time! 📈
+The formula is:
+```
+c(t) = (dose × D / 5) × k1 × k2 × [exponential terms]
+```
 
----
+Where D, k1, k2, and k3 are different for each ester. For example, valerate has completely different parameters than enanthate, which is why they feel so different.
 
-## 🧪 Available Esters
+## Supported esters
 
 - Estradiol Benzoate
-- Estradiol Valerate (default)
+- Estradiol Valerate
 - Estradiol Cypionate
 - Estradiol Cypionate Suspension
 - Estradiol Enanthate
 - Estradiol Undecylate
 - Polyestradiol Phosphate
 
-Each ester has unique pharmacokinetic parameters (D, k1, k2, k3) that affect how quickly it's absorbed and metabolized!
+## Credits
+
+This tool builds on work from:
+- [Transfeminine Science - Injectable E2 Simulator](https://transfemscience.org/misc/injectable-e2-simulator-advanced/)
+- [ESIM Calculator by Gray Oasis](https://grayoasis.com/esim/)
+- [Desmos E2 Calculator](https://www.desmos.com/calculator/yrznshtg3k)
+
+## Disclaimer
+
+This is just a model. Real pharmacokinetics vary person to person based on injection site, technique, metabolism, etc. Use this for education and planning, but check actual levels with bloodwork. Always work with your healthcare provider.
+
+## Tech stack
+
+React, TypeScript, Recharts for graphs, deployed on GitHub Pages.
+
+## License
+
+MIT - use it however you want
 
 ---
 
-## 📚 The Science
-
-EstraDial uses a three-compartment pharmacokinetic model:
-
-```
-c(t) = (dose × D / 5) × k1 × k2 × [exponential decay terms]
-```
-
-Where:
-- **D** = Dose constant (varies by ester)
-- **k1, k2, k3** = Rate constants for absorption and elimination
-- **t** = Time in days since injection
-
-The model calculates concentration for each injection and sums them to show total levels over time.
-
----
-
-## 🛠️ Built With
-
-- **React 19** + TypeScript
-- **Recharts** for beautiful visualizations
-- **Create React App** for the foundation
-- **GitHub Pages** for hosting
-- Lots of ✨ and 💝
-
----
-
-## ⚠️ Important Note
-
-**This tool is for educational purposes only!** Always consult with your healthcare provider about hormone therapy. This calculator provides estimates based on pharmacokinetic models, but individual responses can vary.
-
----
-
-## 💖 Contributing
-
-Found a bug? Have an idea? Open an issue or PR! All contributions welcome 🌈
-
----
-
-## 📜 License
-
-MIT License - feel free to use, modify, and share!
-
----
-
-<p align="center">
-  Made with 💙 by <a href="https://github.com/jessibug-os">jessibug-os</a>
-</p>
+Made by [jessibug-os](https://github.com/jessibug-os)
