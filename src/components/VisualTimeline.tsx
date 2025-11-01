@@ -262,6 +262,23 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
 
   const selectedDoseData = selectedDose !== null ? doses.find(d => d.day === selectedDose) : null;
 
+  // Calculate dosage display text
+  const getDosageDisplayText = (): string => {
+    if (doses.length === 0) return '';
+
+    if (repeatSchedule) {
+      // Calculate average weekly dose for repeated schedules
+      const totalMg = doses.reduce((sum, dose) => sum + dose.dose, 0);
+      const scheduleDays = viewDays;
+      const avgWeeklyDose = (totalMg / scheduleDays) * 7;
+      return ` (${avgWeeklyDose.toFixed(1)}mg avg/week)`;
+    } else {
+      // Calculate total mg for non-repeated schedules
+      const totalMg = doses.reduce((sum, dose) => sum + dose.dose, 0);
+      return ` (${totalMg.toFixed(1)}mg total)`;
+    }
+  };
+
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px' }}>
       <div>
@@ -273,8 +290,8 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{ fontSize: '14px', color: '#6c757d' }}>
-              <strong style={{ color: '#495057' }}>{doses.length} injections</strong>
-              {doses.length > 0 && ` (${Math.min(...doses.map(d => d.day))}-${Math.max(...doses.map(d => d.day))}d)`}
+              <strong style={{ color: '#495057' }}>{doses.length} injection{doses.length !== 1 ? 's' : ''}</strong>
+              {getDosageDisplayText()}
             </div>
             {doses.length > 0 && (
               <div style={{ position: 'relative' }}>
