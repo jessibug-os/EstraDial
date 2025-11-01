@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Dose, ESTRADIOL_ESTERS } from '../data/estradiolEsters';
 
 interface VisualTimelineProps {
@@ -26,6 +26,7 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
   const [previousViewDays, setPreviousViewDays] = useState(viewDays);
   const [editingDose, setEditingDose] = useState<number | null>(null);
   const [editingValue, setEditingValue] = useState<string>('');
+  const inputRefs = useRef<{ [key: number]: HTMLInputElement | null }>({});
 
   // Sync local input state with prop changes
   useEffect(() => {
@@ -155,6 +156,7 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
           title={`Day ${day}: ${dose}mg (${doseData.ester.name})`}
         >
           <input
+            ref={(el) => (inputRefs.current[day] = el)}
             type="text"
             value={isEditing ? editingValue : dose}
             onChange={(e) => {
@@ -211,10 +213,12 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
         onClick={() => {
           addOrUpdateDose(day);
           // Enter editing mode immediately after creating
+          setEditingDose(day);
+          setEditingValue('6');
           setTimeout(() => {
-            setEditingDose(day);
-            setEditingValue('6');
-          }, 0);
+            inputRefs.current[day]?.focus();
+            inputRefs.current[day]?.select();
+          }, 10);
         }}
         style={{
           width: '100%',
