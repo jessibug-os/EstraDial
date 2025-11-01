@@ -39,7 +39,7 @@ function App() {
       doses: DEFAULT_DOSES,
       scheduleLength: 29,
       graphDays: 90,
-      repeat: false
+      repeat: true
     };
   };
 
