@@ -2,7 +2,7 @@
   "name": "estradiol-calculator",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://jessibug-os.github.io/EstraDial",
+  "homepage": "https://jessibug-os.github.io/estradial",
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
