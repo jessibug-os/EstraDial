@@ -3,40 +3,88 @@ export interface ReferencePoint {
   estradiol: number;
 }
 
+// Based on research: "Extensive monitoring of the natural menstrual cycle using the serum biomarkers
+// estradiol, luteinizing hormone and progesterone" (PMC8042396)
+// Study standardized cycles to 29 days with ovulation at day 15
+// Values converted from pmol/L to pg/mL (÷ 3.67)
+//
+// Median values by sub-phase:
+// - Early follicular: 125 pmol/L = 34 pg/mL
+// - Intermediate follicular: 172 pmol/L = 47 pg/mL
+// - Late follicular: 464 pmol/L = 126 pg/mL
+// - Ovulation: 817 pmol/L = 223 pg/mL
+// - Early luteal: 390 pmol/L = 106 pg/mL
+// - Intermediate luteal: 505 pmol/L = 138 pg/mL
+// - Late luteal: 396 pmol/L = 108 pg/mL
 export const CIS_WOMEN_CYCLE: ReferencePoint[] = [
-  { day: 1, estradiol: 50 },    // Early follicular
-  { day: 3, estradiol: 45 },    // Early follicular
-  { day: 5, estradiol: 55 },    // Mid follicular
-  { day: 7, estradiol: 75 },    // Mid follicular
-  { day: 9, estradiol: 95 },    // Late follicular
-  { day: 11, estradiol: 150 },  // Pre-ovulatory
-  { day: 13, estradiol: 250 },  // Pre-ovulatory peak
-  { day: 14, estradiol: 350 },  // Ovulation peak
-  { day: 15, estradiol: 200 },  // Post-ovulatory
-  { day: 17, estradiol: 120 },  // Early luteal
-  { day: 19, estradiol: 130 },  // Mid luteal
-  { day: 21, estradiol: 140 },  // Mid luteal
-  { day: 23, estradiol: 120 },  // Late luteal
-  { day: 25, estradiol: 90 },   // Late luteal
-  { day: 27, estradiol: 60 },   // Pre-menstrual
-  { day: 28, estradiol: 50 },   // Pre-menstrual
+  // Early follicular phase (days 1-5)
+  { day: 1, estradiol: 34 },
+  { day: 2, estradiol: 36 },
+  { day: 3, estradiol: 38 },
+  { day: 4, estradiol: 42 },
+  { day: 5, estradiol: 45 },
+
+  // Intermediate follicular phase (days 6-10)
+  { day: 6, estradiol: 47 },
+  { day: 7, estradiol: 50 },
+  { day: 8, estradiol: 55 },
+  { day: 9, estradiol: 65 },
+  { day: 10, estradiol: 85 },
+
+  // Late follicular phase (days 11-13)
+  { day: 11, estradiol: 110 },
+  { day: 12, estradiol: 126 },
+  { day: 13, estradiol: 175 },
+
+  // Ovulation (days 14-15)
+  { day: 14, estradiol: 223 },
+  { day: 15, estradiol: 200 },
+
+  // Early luteal phase (days 16-18)
+  { day: 16, estradiol: 150 },
+  { day: 17, estradiol: 106 },
+  { day: 18, estradiol: 100 },
+
+  // Intermediate luteal phase (days 19-24)
+  { day: 19, estradiol: 115 },
+  { day: 20, estradiol: 125 },
+  { day: 21, estradiol: 138 },
+  { day: 22, estradiol: 135 },
+  { day: 23, estradiol: 125 },
+  { day: 24, estradiol: 115 },
+
+  // Late luteal phase (days 25-28)
+  { day: 25, estradiol: 108 },
+  { day: 26, estradiol: 85 },
+  { day: 27, estradiol: 55 },
+  { day: 28, estradiol: 40 },
 ];
 
 export function generateReferenceCycle(totalDays: number): ReferencePoint[] {
   const cycleLength = 28;
   const referenceData: ReferencePoint[] = [];
-  
+
   for (let day = 0; day <= totalDays; day++) {
     const cycleDay = (day % cycleLength) + 1;
-    const closestPoint = CIS_WOMEN_CYCLE.reduce((prev, curr) => 
-      Math.abs(curr.day - cycleDay) < Math.abs(prev.day - cycleDay) ? curr : prev
-    );
-    
-    referenceData.push({
-      day,
-      estradiol: closestPoint.estradiol
-    });
+    const referencePoint = CIS_WOMEN_CYCLE.find(p => p.day === cycleDay);
+
+    if (referencePoint) {
+      referenceData.push({
+        day,
+        estradiol: referencePoint.estradiol
+      });
+    } else {
+      // Fallback interpolation if exact day not found
+      const closestPoint = CIS_WOMEN_CYCLE.reduce((prev, curr) =>
+        Math.abs(curr.day - cycleDay) < Math.abs(prev.day - cycleDay) ? curr : prev
+      );
+
+      referenceData.push({
+        day,
+        estradiol: closestPoint.estradiol
+      });
+    }
   }
-  
+
   return referenceData;
 }

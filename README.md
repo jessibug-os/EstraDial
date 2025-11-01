@@ -34,6 +34,21 @@ c(t) = (dose × D / 5) × k1 × k2 × [exponential terms]
 
 Where D, k1, k2, and k3 are different for each ester. For example, valerate has completely different parameters than enanthate, which is why they feel so different.
 
+## Reference cycle data
+
+The "Cis Women Cycle" reference line shown on the graph represents median estradiol levels throughout a natural menstrual cycle. This data comes from:
+
+**"Extensive monitoring of the natural menstrual cycle using the serum biomarkers estradiol, luteinizing hormone and progesterone"** ([PMC8042396](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8042396/))
+
+The study tracked 23 naturally cycling women and provided median estradiol values across cycle phases. Values were standardized to a 29-day cycle with ovulation at day 15, and converted from pmol/L to pg/mL for display in this calculator.
+
+Key reference points:
+- Early follicular: ~34 pg/mL
+- Mid follicular: ~47 pg/mL
+- Late follicular: ~126 pg/mL
+- Ovulation peak: ~223 pg/mL
+- Mid luteal: ~138 pg/mL
+
 ## Supported esters
 
 - Estradiol Benzoate
