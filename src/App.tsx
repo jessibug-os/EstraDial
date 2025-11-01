@@ -25,8 +25,8 @@ function App() {
         }));
         return {
           doses,
-          scheduleLength: decoded.sl || 90,
-          graphDays: decoded.gd || 100,
+          scheduleLength: decoded.sl || 29,
+          graphDays: decoded.gd || 90,
           repeat: decoded.r || false
         };
       } catch (e) {
@@ -36,8 +36,8 @@ function App() {
 
     return {
       doses: DEFAULT_DOSES,
-      scheduleLength: 90,
-      graphDays: 100,
+      scheduleLength: 29,
+      graphDays: 90,
       repeat: false
     };
   };
