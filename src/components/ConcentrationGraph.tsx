@@ -46,7 +46,7 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({
     return () => clearTimeout(timeoutId);
   }, [graphInputValue, viewDays, onViewDaysChange]);
 
-  const formatNumber = (value: number) => {
+  const formatNumber = (value: number): number => {
     if (value >= 1000) {
       return Math.round(value / 50) * 50;
     } else if (value >= 100) {
@@ -54,7 +54,8 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({
     } else if (value >= 10) {
       return Math.round(value);
     } else {
-      return Math.round(value * 10) / 10;
+      // Round to 1 decimal place and parse to remove floating point errors
+      return parseFloat((Math.round(value * 10) / 10).toFixed(1));
     }
   };
 
@@ -229,9 +230,9 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({
             domain={[0, 'auto']}
             ticks={generateYTicks()}
           />
-          <Tooltip 
+          <Tooltip
             formatter={formatTooltip}
-            labelFormatter={(value) => `Day ${value}`}
+            labelFormatter={(value) => `Day ${parseFloat(parseFloat(value).toFixed(1))}`}
           />
           <Legend />
 
@@ -254,18 +255,6 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({
           />
         </LineChart>
       </ResponsiveContainer>
-      
-      <div style={{ marginTop: '10px', fontSize: '14px', color: '#666' }}>
-        <p>
-          <strong>Peak ester concentration (displayed range):</strong> {formatNumber(Math.max(...filteredData.map(d => d.concentration)))} pg/mL
-        </p>
-        <p>
-          <strong>Reference cycle range:</strong> {formatNumber(Math.min(...referenceData.map(d => d.estradiol)))}-{formatNumber(Math.max(...referenceData.map(d => d.estradiol)))} pg/mL
-        </p>
-        <p>
-          <strong>Displayed time range:</strong> {filteredData[0]?.time || 0} - {viewDays} days
-        </p>
-      </div>
     </div>
   );
 };

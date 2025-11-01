@@ -52,6 +52,7 @@ function App() {
   const [scheduleLength, setScheduleLength] = useState(initial.scheduleLength);
   const [graphDisplayDays, setGraphDisplayDays] = useState(initial.graphDays);
   const [repeatSchedule, setRepeatSchedule] = useState(initial.repeat);
+  const [steadyState, setSteadyState] = useState(false);
   const [referenceCycleType, setReferenceCycleType] = useState<ReferenceCycleType>(initial.cycleType);
 
   // Update URL when schedule changes
@@ -75,9 +76,12 @@ function App() {
     if (repeatSchedule && doses.length > 0) {
       const repeatedDoses: Dose[] = [];
       const cycleLength = scheduleLength;
-      const numCycles = Math.ceil(graphDisplayDays / cycleLength);
 
-      for (let cycle = 0; cycle < numCycles; cycle++) {
+      // If steady state, add cycles BEFORE day 0 to build up residual levels
+      const startCycle = steadyState ? -3 : 0; // 3 cycles before to reach steady state
+      const numCycles = Math.ceil(graphDisplayDays / cycleLength) + (steadyState ? 3 : 0);
+
+      for (let cycle = startCycle; cycle < numCycles; cycle++) {
         doses.forEach(dose => {
           repeatedDoses.push({
             ...dose,
@@ -91,8 +95,11 @@ function App() {
 
     const timePoints = generateTimePoints(graphDisplayDays + 100, 0.5);
     const data = calculateTotalConcentration(dosesForCalculation, timePoints);
-    setConcentrationData(data);
-  }, [doses, scheduleLength, graphDisplayDays, repeatSchedule]);
+
+    // Filter to only show data from day 0 onwards
+    const filteredData = data.filter(point => point.time >= 0);
+    setConcentrationData(filteredData);
+  }, [doses, scheduleLength, graphDisplayDays, repeatSchedule, steadyState]);
 
   return (
     <div className="App" style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
@@ -111,6 +118,9 @@ function App() {
         onViewDaysChange={setScheduleLength}
         repeatSchedule={repeatSchedule}
         onRepeatScheduleChange={setRepeatSchedule}
+        steadyState={steadyState}
+        onSteadyStateChange={setSteadyState}
+        referenceCycleType={referenceCycleType}
       />
       <ConcentrationGraph
         data={concentrationData}
@@ -126,7 +136,7 @@ function App() {
           c(t) = (dose × D / 5) × k1 × k2 × [exponential terms] for day &lt; t &lt; day + 100
         </p>
         <p>
-          Results are for educational purposes only and should not be used for medical decisions.
+          Results are for educational purposes only and should not be used for medical decisions. This is a model. Get bloodwork for real levels. Consult your healthcare provider.
         </p>
       </footer>
     </div>
