@@ -283,20 +283,20 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
                   style={{
                     padding: '3px 8px',
                     fontSize: '12px',
-                    color: '#dc3545',
+                    color: '#c77a9b',
                     backgroundColor: 'transparent',
-                    border: '1px solid #dc3545',
+                    border: '1px solid #c77a9b',
                     borderRadius: '4px',
                     cursor: 'pointer',
                     transition: 'all 0.15s ease'
                   }}
                   onMouseOver={(e) => {
-                    e.currentTarget.style.backgroundColor = '#dc3545';
+                    e.currentTarget.style.backgroundColor = '#c77a9b';
                     e.currentTarget.style.color = 'white';
                   }}
                   onMouseOut={(e) => {
                     e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = '#dc3545';
+                    e.currentTarget.style.color = '#c77a9b';
                   }}
                 >
                   Reset
@@ -393,7 +393,7 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
                           style={{
                             flex: 1,
                             padding: '8px',
-                            backgroundColor: '#dc3545',
+                            backgroundColor: '#c77a9b',
                             color: 'white',
                             border: 'none',
                             borderRadius: '4px',
@@ -475,8 +475,8 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
 
       <div style={{
         padding: '20px',
-        backgroundColor: selectedDoseData ? '#fff3cd' : '#ffffff',
-        border: `1px solid ${selectedDoseData ? '#ffeaa7' : '#dee2e6'}`,
+        backgroundColor: selectedDoseData ? '#f3eeff' : '#ffffff',
+        border: `1px solid ${selectedDoseData ? '#d8c7f0' : '#dee2e6'}`,
         borderRadius: '8px',
         boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
         height: '454px',
@@ -532,8 +532,8 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
               </div>
             </div>
 
-            <div style={{ marginBottom: '20px', padding: '12px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-              <div style={{ fontSize: '12px', fontWeight: '600', marginBottom: '8px', color: '#495057' }}>Pharmacokinetic Parameters:</div>
+            <div style={{ marginBottom: '20px', padding: '12px', backgroundColor: '#e8dff5', borderRadius: '4px' }}>
+              <div style={{ fontSize: '12px', fontWeight: '600', marginBottom: '8px', color: '#5a3d7a' }}>Pharmacokinetic Parameters:</div>
               <div style={{ fontSize: '12px', color: '#6c757d' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                   <span>D:</span>
@@ -559,7 +559,7 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
                 onClick={() => setSelectedDose(null)}
                 style={{
                   padding: '10px 16px',
-                  backgroundColor: '#6c757d',
+                  backgroundColor: '#8b72b8',
                   color: 'white',
                   border: 'none',
                   borderRadius: '6px',
@@ -574,7 +574,7 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
                 onClick={() => removeDose(selectedDoseData.day)}
                 style={{
                   padding: '10px 16px',
-                  backgroundColor: '#dc3545',
+                  backgroundColor: '#c77a9b',
                   color: 'white',
                   border: 'none',
                   borderRadius: '6px',
