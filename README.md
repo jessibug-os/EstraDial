@@ -1,20 +1,20 @@
 # EstraDial
 
-A tool for visualizing estradiol ester concentrations over time based on your injection schedule.
+**[Try it here →](https://jessibug-os.github.io/estradial)**
 
-**[Live demo](https://jessibug-os.github.io/EstraDial)**
+A visual calculator for tracking estradiol levels from injections. Click days to add doses, pick your ester, see what your levels do over time.
 
-## What does this do?
+## Features
 
-If you're doing estradiol injections, you've probably wondered what your levels look like between doses. This calculator uses pharmacokinetic models to show you exactly that. You can:
+Tired of guessing what's happening between injection days? This thing models it for you:
 
-- Add injections by clicking on a calendar
-- Pick different esters for each dose (valerate, cypionate, enanthate, etc.)
-- See a graph of your levels over time
-- Compare against a reference menstrual cycle
-- Repeat your schedule to visualize steady-state levels
+- Click-to-add calendar for scheduling injections
+- Mix and match esters (valerate, cypionate, enanthate, you name it)
+- Live graph showing your projected levels
+- Reference line comparing to cis women's natural cycle
+- Repeat mode to see what steady-state looks like
 
-## Running locally
+## Running it yourself
 
 ```bash
 npm install
@@ -25,24 +25,19 @@ Then open http://localhost:3000
 
 ## How it works
 
-The calculator uses a three-compartment pharmacokinetic model with parameters specific to each ester type. Basically it takes the dose, ester type, and time since injection, runs it through some exponential decay math, and gives you an estimated concentration.
+Uses a three-compartment pharmacokinetic model. Each ester has its own parameters (D, k1, k2, k3) that describe how it releases and metabolizes. The math:
 
-The formula is:
 ```
 c(t) = (dose × D / 5) × k1 × k2 × [exponential terms]
 ```
 
-Where D, k1, k2, and k3 are different for each ester. For example, valerate has completely different parameters than enanthate, which is why they feel so different.
+This is why valerate and enanthate feel so different - they literally have different decay curves.
 
-## Reference cycle data
+## Reference data
 
-The "Cis Women Cycle" reference line shown on the graph represents median estradiol levels throughout a natural menstrual cycle. This data comes from:
+The orange reference line comes from [this study](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8042396/) tracking estradiol levels in 23 cis women across their cycles. Converted from pmol/L to pg/mL so you can compare directly:
 
-**"Extensive monitoring of the natural menstrual cycle using the serum biomarkers estradiol, luteinizing hormone and progesterone"** ([PMC8042396](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8042396/))
-
-The study tracked 23 naturally cycling women and provided median estradiol values across cycle phases. Values were standardized to a 29-day cycle with ovulation at day 15, and converted from pmol/L to pg/mL for display in this calculator.
-
-Key reference points:
+Typical levels throughout the month:
 - Early follicular: ~34 pg/mL
 - Mid follicular: ~47 pg/mL
 - Late follicular: ~126 pg/mL
@@ -66,13 +61,13 @@ This tool builds on work from:
 - [ESIM Calculator by Gray Oasis](https://grayoasis.com/esim/)
 - [Desmos E2 Calculator](https://www.desmos.com/calculator/yrznshtg3k)
 
-## Disclaimer
+## Important
 
-This is just a model. Real pharmacokinetics vary person to person based on injection site, technique, metabolism, etc. Use this for education and planning, but check actual levels with bloodwork. Always work with your healthcare provider.
+This is a model, not a blood test. Everyone metabolizes differently based on injection site, technique, body composition, etc. Use this for planning and education, but get actual bloodwork to know your real levels. Talk to your healthcare provider about dosing.
 
-## Tech stack
+## Built with
 
-React, TypeScript, Recharts for graphs, deployed on GitHub Pages.
+React + TypeScript + Recharts, deployed on GitHub Pages.
 
 ## License
 
