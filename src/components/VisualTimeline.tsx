@@ -24,6 +24,8 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
   const [scheduleInputValue, setScheduleInputValue] = useState(viewDays.toString());
   const [showResetModal, setShowResetModal] = useState(false);
   const [previousViewDays, setPreviousViewDays] = useState(viewDays);
+  const [editingDose, setEditingDose] = useState<number | null>(null);
+  const [editingValue, setEditingValue] = useState<string>('');
 
   // Sync local input state with prop changes
   useEffect(() => {
@@ -106,15 +108,23 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
     const dose = getDoseAtDay(day);
     const hasInjection = dose !== null;
     const isSelected = selectedDose === day;
+    const isEditing = editingDose === day;
 
     return (
       <div
         key={day}
         onClick={() => {
-          if (hasInjection) {
+          if (hasInjection && !isEditing) {
             setSelectedDose(isSelected ? null : day);
-          } else {
+          } else if (!hasInjection) {
             addOrUpdateDose(day);
+          }
+        }}
+        onDoubleClick={(e) => {
+          if (hasInjection) {
+            e.stopPropagation();
+            setEditingDose(day);
+            setEditingValue(dose?.toString() || '');
           }
         }}
         style={{
@@ -134,9 +144,47 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
           transition: 'all 0.15s ease',
           boxShadow: hasInjection ? '0 1px 2px rgba(0,123,255,0.3)' : 'none'
         }}
-        title={hasInjection ? `Day ${day}: ${dose}mg` : `Day ${day}: Click to add injection`}
+        title={hasInjection ? `Day ${day}: ${dose}mg (double-click to edit)` : `Day ${day}: Click to add injection`}
       >
-        {hasInjection ? dose : day % 7 === 0 ? day : ''}
+        {isEditing ? (
+          <input
+            type="number"
+            value={editingValue}
+            onChange={(e) => setEditingValue(e.target.value)}
+            onBlur={() => {
+              const newDose = parseFloat(editingValue);
+              if (!isNaN(newDose) && newDose > 0) {
+                updateDoseAmount(day, newDose);
+              }
+              setEditingDose(null);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                const newDose = parseFloat(editingValue);
+                if (!isNaN(newDose) && newDose > 0) {
+                  updateDoseAmount(day, newDose);
+                }
+                setEditingDose(null);
+              } else if (e.key === 'Escape') {
+                setEditingDose(null);
+              }
+            }}
+            onClick={(e) => e.stopPropagation()}
+            autoFocus
+            style={{
+              width: '90%',
+              height: '80%',
+              border: 'none',
+              borderRadius: '2px',
+              textAlign: 'center',
+              fontSize: '13px',
+              fontWeight: '600',
+              padding: '2px'
+            }}
+          />
+        ) : (
+          hasInjection ? dose : day % 7 === 0 ? day : ''
+        )}
       </div>
     );
   };
