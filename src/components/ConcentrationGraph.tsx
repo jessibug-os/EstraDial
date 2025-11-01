@@ -26,6 +26,18 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({ data, viewDays,
     setGraphInputValue(viewDays.toString());
   }, [viewDays]);
 
+  // Debounce graph display days changes
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      const numValue = parseInt(graphInputValue);
+      if (!isNaN(numValue) && numValue >= 1 && numValue !== viewDays) {
+        onViewDaysChange(numValue);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timeoutId);
+  }, [graphInputValue, viewDays, onViewDaysChange]);
+
   const formatNumber = (value: number) => {
     if (value >= 1000) {
       return Math.round(value / 50) * 50;
@@ -77,13 +89,7 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({ data, viewDays,
             value={graphInputValue}
             onChange={(e) => {
               const val = e.target.value;
-              setGraphInputValue(val); // Allow any input including empty
-              if (val !== '') {
-                const num = parseInt(val);
-                if (!isNaN(num) && num >= 1) {
-                  onViewDaysChange(num);
-                }
-              }
+              setGraphInputValue(val); // Only update local state, debounce handles propagation
             }}
             onBlur={(e) => {
               const val = e.target.value;

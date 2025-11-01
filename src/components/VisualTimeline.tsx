@@ -23,11 +23,39 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
   const [selectedDose, setSelectedDose] = useState<number | null>(null);
   const [scheduleInputValue, setScheduleInputValue] = useState(viewDays.toString());
   const [showResetModal, setShowResetModal] = useState(false);
+  const [previousViewDays, setPreviousViewDays] = useState(viewDays);
 
   // Sync local input state with prop changes
   useEffect(() => {
     setScheduleInputValue(viewDays.toString());
   }, [viewDays]);
+
+  // Debounce schedule length changes
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      const numValue = parseInt(scheduleInputValue);
+      if (!isNaN(numValue) && numValue >= 1 && numValue !== viewDays) {
+        onViewDaysChange(numValue);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timeoutId);
+  }, [scheduleInputValue, viewDays, onViewDaysChange]);
+
+  // Auto-remove injections beyond schedule length when it's reduced
+  useEffect(() => {
+    if (viewDays < previousViewDays && doses.length > 0) {
+      const dosesOutOfRange = doses.filter(d => d.day >= viewDays);
+      if (dosesOutOfRange.length > 0) {
+        const newDoses = doses.filter(d => d.day < viewDays);
+        onDosesChange(newDoses);
+        if (selectedDose !== null && selectedDose >= viewDays) {
+          setSelectedDose(null);
+        }
+      }
+    }
+    setPreviousViewDays(viewDays);
+  }, [viewDays, doses, previousViewDays, selectedDose, onDosesChange]);
 
   // Default to Estradiol valerate for new injections
   const DEFAULT_ESTER = ESTRADIOL_ESTERS[1];
@@ -301,13 +329,7 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
                 value={scheduleInputValue}
                 onChange={(e) => {
                   const val = e.target.value;
-                  setScheduleInputValue(val); // Allow any input including empty
-                  if (val !== '') {
-                    const num = parseInt(val);
-                    if (!isNaN(num) && num >= 1) {
-                      onViewDaysChange(num);
-                    }
-                  }
+                  setScheduleInputValue(val); // Only update local state, debounce handles propagation
                 }}
                 onBlur={(e) => {
                   const val = e.target.value;
