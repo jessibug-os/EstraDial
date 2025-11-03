@@ -9,6 +9,7 @@ import OptimizerModal from './OptimizerModal';
 import PresetsMenu from './PresetsMenu';
 import ResetConfirmation from './ResetConfirmation';
 import DoseEditor from './DoseEditor';
+import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, BUTTON_STYLES, INPUT_STYLES, mergeStyles } from '../constants/styles';
 
 interface VisualTimelineProps {
   doses: Dose[];
@@ -132,16 +133,16 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
             width: '100%',
             aspectRatio: '1',
             backgroundColor,
-            border: isSelected ? '2px solid #7952b3' : '1px solid #dee2e6',
-            borderRadius: '4px',
+            border: isSelected ? `2px solid ${COLORS.primaryHover}` : `1px solid ${COLORS.gray300}`,
+            borderRadius: BORDER_RADIUS.sm,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '13px',
-            color: 'white',
-            fontWeight: '600',
-            position: 'relative',
+            fontSize: TYPOGRAPHY.fontSize.base,
+            color: COLORS.white,
+            fontWeight: TYPOGRAPHY.fontWeight.semibold,
+            position: 'relative' as const,
             transition: 'all 0.15s ease',
             boxShadow: `0 1px 2px ${backgroundColor}66`,
             overflow: 'hidden'
@@ -187,10 +188,10 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
               maxWidth: '4ch',
               border: 'none',
               background: 'transparent',
-              textAlign: 'center',
-              fontSize: '13px',
-              fontWeight: '600',
-              color: 'white',
+              textAlign: 'center' as const,
+              fontSize: TYPOGRAPHY.fontSize.base,
+              fontWeight: TYPOGRAPHY.fontWeight.semibold,
+              color: COLORS.white,
               padding: '0',
               outline: 'none',
               cursor: 'pointer'
@@ -199,13 +200,13 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
           {/* Volume display in corner */}
           <div
             style={{
-              position: 'absolute',
+              position: 'absolute' as const,
               bottom: '2px',
               right: '3px',
-              fontSize: '9px',
-              fontWeight: '500',
+              fontSize: TYPOGRAPHY.fontSize.xs,
+              fontWeight: TYPOGRAPHY.fontWeight.medium,
               color: 'rgba(255, 255, 255, 0.85)',
-              pointerEvents: 'none',
+              pointerEvents: 'none' as const,
               textShadow: '0 0 2px rgba(0,0,0,0.3)'
             }}
           >
@@ -232,17 +233,17 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
         style={{
           width: '100%',
           aspectRatio: '1',
-          backgroundColor: '#f8f9fa',
-          border: '1px solid #dee2e6',
-          borderRadius: '4px',
+          backgroundColor: COLORS.gray50,
+          border: `1px solid ${COLORS.gray300}`,
+          borderRadius: BORDER_RADIUS.sm,
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '13px',
-          color: '#6c757d',
-          fontWeight: '400',
-          position: 'relative',
+          fontSize: TYPOGRAPHY.fontSize.base,
+          color: COLORS.gray600,
+          fontWeight: TYPOGRAPHY.fontWeight.normal,
+          position: 'relative' as const,
           transition: 'all 0.15s ease'
         }}
         title={`Day ${day}: Click to add injection`}
@@ -260,7 +261,7 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
         weekDays.push(renderTimelineDay(day));
       }
       weeks.push(
-        <div key={week} style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px', marginBottom: '6px' }}>
+        <div key={week} style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: SPACING.sm, marginBottom: SPACING.sm }}>
           {weekDays}
         </div>
       );
@@ -288,36 +289,26 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
   };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: SPACING['3xl'] }}>
       <div>
         <div style={{
-          marginBottom: '12px',
+          marginBottom: SPACING.xl,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ fontSize: '14px', color: '#6c757d' }}>
-              <strong style={{ color: '#495057' }}>{doses.length} injection{doses.length !== 1 ? 's' : ''}</strong>
+          <div style={{ display: 'flex', alignItems: 'center', gap: SPACING.lg }}>
+            <div style={{ fontSize: TYPOGRAPHY.fontSize.md, color: COLORS.gray600 }}>
+              <strong style={{ color: COLORS.gray700 }}>{doses.length} injection{doses.length !== 1 ? 's' : ''}</strong>
               {getDosageDisplayText()}
             </div>
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: SPACING.md }}>
               <div style={{ position: 'relative' }}>
                 <button
                   onClick={() => setShowOptimizerModal(true)}
-                  style={{
-                    padding: '4px 10px',
-                    fontSize: '12px',
-                    backgroundColor: '#b794f6',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontWeight: '500',
-                    transition: 'background-color 0.2s'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#9b72cf'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#b794f6'}
+                  style={mergeStyles(BUTTON_STYLES.base, BUTTON_STYLES.small, BUTTON_STYLES.primary)}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = COLORS.primaryHover}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = COLORS.primary}
                 >
                   Optimize
                 </button>
@@ -325,19 +316,12 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
               <div style={{ position: 'relative' }}>
                 <button
                   onClick={() => setShowPresetsMenu(!showPresetsMenu)}
-                  style={{
-                    padding: '4px 10px',
-                    fontSize: '12px',
-                    backgroundColor: '#6c757d',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontWeight: '500',
-                    transition: 'background-color 0.2s'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5a6268'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6c757d'}
+                  style={mergeStyles(BUTTON_STYLES.base, BUTTON_STYLES.small, {
+                    backgroundColor: COLORS.gray600,
+                    color: COLORS.white
+                  })}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = COLORS.gray700}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = COLORS.gray600}
                 >
                   Preset
                 </button>
@@ -356,23 +340,20 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
                 <div style={{ position: 'relative' }}>
                   <button
                     onClick={() => setShowResetModal(true)}
-                  style={{
-                    padding: '3px 8px',
-                    fontSize: '12px',
-                    color: '#c77a9b',
+                  style={mergeStyles(BUTTON_STYLES.base, BUTTON_STYLES.small, {
+                    padding: `${SPACING.xs} ${SPACING.md}`,
+                    color: COLORS.danger,
                     backgroundColor: 'transparent',
-                    border: '1px solid #c77a9b',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
+                    border: `1px solid ${COLORS.danger}`,
                     transition: 'all 0.15s ease'
-                  }}
+                  })}
                   onMouseOver={(e) => {
-                    e.currentTarget.style.backgroundColor = '#c77a9b';
-                    e.currentTarget.style.color = 'white';
+                    e.currentTarget.style.backgroundColor = COLORS.danger;
+                    e.currentTarget.style.color = COLORS.white;
                   }}
                   onMouseOut={(e) => {
                     e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = '#c77a9b';
+                    e.currentTarget.style.color = COLORS.danger;
                   }}
                 >
                   Reset
@@ -405,9 +386,9 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
             onEnableSteadyState={() => onSteadyStateChange(true)}
           />
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <label style={{ fontSize: '13px', color: '#6c757d' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: SPACING.xl }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: SPACING.sm }}>
+              <label style={{ fontSize: TYPOGRAPHY.fontSize.base, color: COLORS.gray600 }}>
                 Schedule:
               </label>
               <input
@@ -426,18 +407,15 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
                   }
                 }}
                 min="1"
-                style={{
-                  width: '60px',
-                  padding: '4px 6px',
-                  fontSize: '13px',
-                  borderRadius: '4px',
-                  border: '1px solid #ccc'
-                }}
+                style={mergeStyles(INPUT_STYLES.base, INPUT_STYLES.number, {
+                  padding: `${SPACING.xs} ${SPACING.sm}`,
+                  fontSize: TYPOGRAPHY.fontSize.base
+                })}
               />
-              <span style={{ fontSize: '13px', color: '#6c757d' }}>days</span>
+              <span style={{ fontSize: TYPOGRAPHY.fontSize.base, color: COLORS.gray600 }}>days</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <label style={{ fontSize: '13px', color: '#6c757d', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: SPACING.sm }}>
+              <label style={{ fontSize: TYPOGRAPHY.fontSize.base, color: COLORS.gray600, display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                 <input
                   type="checkbox"
                   checked={repeatSchedule}
@@ -445,18 +423,18 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
                   style={{
                     width: '16px',
                     height: '16px',
-                    marginRight: '4px',
+                    marginRight: SPACING.xs,
                     cursor: 'pointer'
                   }}
                 />
-                <span style={{ fontSize: '13px' }}>Repeat</span>
+                <span style={{ fontSize: TYPOGRAPHY.fontSize.base }}>Repeat</span>
               </label>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: SPACING.sm }}>
               <label
                 style={{
-                  fontSize: '13px',
-                  color: repeatSchedule ? '#6c757d' : '#adb5bd',
+                  fontSize: TYPOGRAPHY.fontSize.base,
+                  color: repeatSchedule ? COLORS.gray600 : COLORS.gray500,
                   display: 'flex',
                   alignItems: 'center',
                   cursor: repeatSchedule ? 'pointer' : 'not-allowed'
@@ -471,22 +449,22 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
                   style={{
                     width: '16px',
                     height: '16px',
-                    marginRight: '4px',
+                    marginRight: SPACING.xs,
                     cursor: repeatSchedule ? 'pointer' : 'not-allowed'
                   }}
                 />
-                <span style={{ fontSize: '13px' }}>Steady State</span>
+                <span style={{ fontSize: TYPOGRAPHY.fontSize.base }}>Steady State</span>
               </label>
             </div>
           </div>
         </div>
         <div className="hide-scrollbar" style={{
-          border: '2px solid #dee2e6',
-          borderRadius: '4px',
-          backgroundColor: '#ffffff',
+          border: `2px solid ${COLORS.gray300}`,
+          borderRadius: BORDER_RADIUS.sm,
+          backgroundColor: COLORS.white,
           height: '400px',
-          overflowY: 'auto',
-          padding: '12px',
+          overflowY: 'auto' as const,
+          padding: SPACING.xl,
           scrollbarWidth: 'none', // Firefox
           msOverflowStyle: 'none' // IE/Edge
         }}>

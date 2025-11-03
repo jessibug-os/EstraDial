@@ -7,6 +7,7 @@ import { useDebouncedInput } from '../hooks/useDebounce';
 import { parsePositiveInteger } from '../utils/validation';
 import ErrorBoundary from './ErrorBoundary';
 import { OPTIMIZER_DEFAULTS, Z_INDEX } from '../constants/defaults';
+import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, BUTTON_STYLES, INPUT_STYLES, MODAL_STYLES, mergeStyles } from '../constants/styles';
 
 interface OptimizerModalProps {
   isOpen: boolean;
@@ -54,37 +55,21 @@ const OptimizerModal: React.FC<OptimizerModalProps> = ({
     <ErrorBoundary
       fallback={
         <div
-          style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            backgroundColor: 'white',
-            padding: '24px',
-            borderRadius: '8px',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
+          style={mergeStyles(MODAL_STYLES.content, MODAL_STYLES.smallContent, {
             zIndex: Z_INDEX.MODAL_ELEVATED,
-            maxWidth: '400px',
-            textAlign: 'center'
-          }}
+            textAlign: 'center' as const
+          })}
         >
-          <div style={{ fontSize: '32px', marginBottom: '12px' }}>⚠️</div>
-          <h3 style={{ margin: '0 0 8px 0', fontSize: '18px' }}>Optimizer Error</h3>
-          <p style={{ fontSize: '14px', color: '#6c757d', marginBottom: '16px' }}>
+          <div style={{ fontSize: TYPOGRAPHY.fontSize['2xl'], marginBottom: SPACING.xl }}>⚠️</div>
+          <h3 style={{ margin: `0 0 ${SPACING.md} 0`, fontSize: TYPOGRAPHY.fontSize.xl }}>Optimizer Error</h3>
+          <p style={{ fontSize: TYPOGRAPHY.fontSize.md, color: COLORS.gray600, marginBottom: SPACING['2xl'] }}>
             The schedule optimizer encountered an error. Please try different settings or close and try again.
           </p>
           <button
             onClick={onClose}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: '#b794f6',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '500'
-            }}
+            style={mergeStyles(BUTTON_STYLES.base, BUTTON_STYLES.primary, {
+              padding: `${SPACING.lg} ${SPACING['3xl']}`
+            })}
           >
             Close
           </button>
@@ -93,46 +78,29 @@ const OptimizerModal: React.FC<OptimizerModalProps> = ({
     >
       <>
       <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          zIndex: Z_INDEX.MODAL_CONTENT,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
+        style={mergeStyles(MODAL_STYLES.backdrop, {
+          zIndex: Z_INDEX.MODAL_CONTENT
+        })}
         onClick={onClose}
       />
       <div
-        style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          backgroundColor: 'white',
-          padding: '24px',
-          borderRadius: '8px',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
+        style={mergeStyles(MODAL_STYLES.content, {
           zIndex: Z_INDEX.MODAL_ELEVATED,
           maxWidth: '500px',
           width: '90%'
-        }}
+        })}
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 style={{ margin: '0 0 16px 0', fontSize: '18px' }}>Schedule Optimizer</h3>
-        <p style={{ fontSize: '14px', color: '#6c757d', marginBottom: '20px' }}>
+        <h3 style={MODAL_STYLES.title}>Schedule Optimizer</h3>
+        <p style={{ fontSize: TYPOGRAPHY.fontSize.md, color: COLORS.gray600, marginBottom: SPACING['3xl'] }}>
           Select which esters you have access to, and the optimizer will find the best injection schedule to match your selected reference cycle.
         </p>
 
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ fontSize: '14px', fontWeight: '600', display: 'block', marginBottom: '10px' }}>
+        <div style={{ marginBottom: SPACING['3xl'] }}>
+          <label style={{ fontSize: TYPOGRAPHY.fontSize.md, fontWeight: TYPOGRAPHY.fontWeight.semibold, display: 'block', marginBottom: SPACING.lg }}>
             Injections Per Cycle:
           </label>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: SPACING.xl, alignItems: 'center' }}>
             <input
               type="number"
               min="1"
@@ -147,25 +115,21 @@ const OptimizerModal: React.FC<OptimizerModalProps> = ({
                   setMaxInjections(1);
                 }
               }}
-              style={{
-                width: '80px',
-                padding: '8px',
-                border: '1px solid #dee2e6',
-                borderRadius: '4px',
-                fontSize: '14px'
-              }}
+              style={mergeStyles(INPUT_STYLES.base, INPUT_STYLES.numberLarge, {
+                fontSize: TYPOGRAPHY.fontSize.md
+              })}
             />
-            <span style={{ fontSize: '13px', color: '#6c757d' }}>
+            <span style={{ fontSize: TYPOGRAPHY.fontSize.base, color: COLORS.gray600 }}>
               injections (in {viewDays} days = {formatNumber(maxInjections / viewDays * 7)} per week)
             </span>
           </div>
-          <div style={{ fontSize: '12px', color: '#6c757d', marginTop: '6px' }}>
+          <div style={{ fontSize: TYPOGRAPHY.fontSize.sm, color: COLORS.gray600, marginTop: SPACING.sm }}>
             The optimizer will find the best schedule using {maxInjections} injection{maxInjections !== 1 ? 's' : ''}.
           </div>
         </div>
 
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ fontSize: '14px', fontWeight: '600', display: 'block', marginBottom: '10px' }}>
+        <div style={{ marginBottom: SPACING['3xl'] }}>
+          <label style={{ fontSize: TYPOGRAPHY.fontSize.md, fontWeight: TYPOGRAPHY.fontWeight.semibold, display: 'block', marginBottom: SPACING.lg }}>
             Available Esters:
           </label>
           {ESTRADIOL_ESTERS.map((ester, index) => (
@@ -174,10 +138,10 @@ const OptimizerModal: React.FC<OptimizerModalProps> = ({
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                padding: '8px',
-                marginBottom: '6px',
-                borderRadius: '4px',
-                backgroundColor: selectedEsters.includes(ester) ? '#f0e6ff' : '#f8f9fa',
+                padding: SPACING.md,
+                marginBottom: SPACING.sm,
+                borderRadius: BORDER_RADIUS.sm,
+                backgroundColor: selectedEsters.includes(ester) ? '#f0e6ff' : COLORS.gray50,
                 cursor: 'pointer',
                 transition: 'background-color 0.15s'
               }}
@@ -192,26 +156,26 @@ const OptimizerModal: React.FC<OptimizerModalProps> = ({
                     setSelectedEsters(selectedEsters.filter(e => e.name !== ester.name));
                   }
                 }}
-                style={{ marginRight: '10px', cursor: 'pointer' }}
+                style={{ marginRight: SPACING.lg, cursor: 'pointer' }}
               />
-              <span style={{ fontSize: '13px' }}>{ester.name}</span>
+              <span style={{ fontSize: TYPOGRAPHY.fontSize.base }}>{ester.name}</span>
             </label>
           ))}
         </div>
 
         {selectedEsters.length === 0 && (
-          <div style={{ padding: '10px', backgroundColor: '#fff3cd', borderRadius: '4px', marginBottom: '16px' }}>
-            <span style={{ fontSize: '13px', color: '#856404' }}>
+          <div style={{ padding: SPACING.lg, backgroundColor: COLORS.warning, borderRadius: BORDER_RADIUS.sm, marginBottom: SPACING['2xl'] }}>
+            <span style={{ fontSize: TYPOGRAPHY.fontSize.base, color: COLORS.warningText }}>
               Please select at least one ester
             </span>
           </div>
         )}
 
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ fontSize: '14px', fontWeight: '600', display: 'block', marginBottom: '10px' }}>
+        <div style={{ marginBottom: SPACING['3xl'] }}>
+          <label style={{ fontSize: TYPOGRAPHY.fontSize.md, fontWeight: TYPOGRAPHY.fontWeight.semibold, display: 'block', marginBottom: SPACING.lg }}>
             Volume Granularity (minimum volume increment):
           </label>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: SPACING.md, alignItems: 'center' }}>
             <input
               type="range"
               min="0.01"
@@ -228,17 +192,15 @@ const OptimizerModal: React.FC<OptimizerModalProps> = ({
               step="0.01"
               value={formatNumber(granularity, 3)}
               onChange={(e) => setGranularity(Math.round(parseFloat(e.target.value) * 100) / 100 || 0.05)}
-              style={{
+              style={mergeStyles(INPUT_STYLES.base, {
                 width: '70px',
-                padding: '6px 8px',
-                border: '1px solid #dee2e6',
-                borderRadius: '4px',
-                fontSize: '13px'
-              }}
+                padding: `${SPACING.sm} ${SPACING.md}`,
+                fontSize: TYPOGRAPHY.fontSize.base
+              })}
             />
-            <span style={{ fontSize: '13px', color: '#6c757d', minWidth: '30px' }}>mL</span>
+            <span style={{ fontSize: TYPOGRAPHY.fontSize.base, color: COLORS.gray600, minWidth: '30px' }}>mL</span>
           </div>
-          <div style={{ fontSize: '12px', color: '#6c757d', marginTop: '6px' }}>
+          <div style={{ fontSize: TYPOGRAPHY.fontSize.sm, color: COLORS.gray600, marginTop: SPACING.sm }}>
             {granularity <= 0.025 ? 'Very fine adjustments (slower, for precision)' :
              granularity <= 0.05 ? 'Fine adjustments (balanced)' :
              'Coarse adjustments (faster)'}
@@ -246,46 +208,38 @@ const OptimizerModal: React.FC<OptimizerModalProps> = ({
         </div>
 
         {isOptimizing && (
-          <div style={{ marginBottom: '16px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-              <span style={{ fontSize: '13px', color: '#6c757d' }}>
+          <div style={{ marginBottom: SPACING['2xl'] }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: SPACING.sm }}>
+              <span style={{ fontSize: TYPOGRAPHY.fontSize.base, color: COLORS.gray600 }}>
                 Optimizing... {optimizationProgress}%
               </span>
-              <span style={{ fontSize: '12px', color: '#999' }}>
+              <span style={{ fontSize: TYPOGRAPHY.fontSize.sm, color: '#999' }}>
                 Score: {formatNumber(optimizationScore)}
               </span>
             </div>
             <div style={{
               width: '100%',
-              height: '8px',
-              backgroundColor: '#e9ecef',
-              borderRadius: '4px',
+              height: SPACING.md,
+              backgroundColor: COLORS.gray200,
+              borderRadius: BORDER_RADIUS.sm,
               overflow: 'hidden'
             }}>
               <div style={{
                 width: `${optimizationProgress}%`,
                 height: '100%',
-                backgroundColor: '#b794f6',
+                backgroundColor: COLORS.primary,
                 transition: 'width 0.3s ease'
               }} />
             </div>
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: SPACING.lg }}>
           <button
             onClick={onClose}
-            style={{
-              flex: 1,
-              padding: '10px',
-              backgroundColor: '#f8f9fa',
-              color: '#495057',
-              border: '1px solid #dee2e6',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '500'
-            }}
+            style={mergeStyles(BUTTON_STYLES.base, BUTTON_STYLES.secondary, {
+              flex: 1
+            })}
           >
             Cancel
           </button>
@@ -332,17 +286,11 @@ const OptimizerModal: React.FC<OptimizerModalProps> = ({
               }
             }}
             disabled={selectedEsters.length === 0 || isOptimizing}
-            style={{
+            style={mergeStyles(BUTTON_STYLES.base, BUTTON_STYLES.primary, {
               flex: 1,
-              padding: '10px',
-              backgroundColor: selectedEsters.length === 0 || isOptimizing ? '#dee2e6' : '#b794f6',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: selectedEsters.length === 0 || isOptimizing ? 'not-allowed' : 'pointer',
-              fontSize: '14px',
-              fontWeight: '500'
-            }}
+              backgroundColor: selectedEsters.length === 0 || isOptimizing ? COLORS.gray300 : COLORS.primary,
+              cursor: selectedEsters.length === 0 || isOptimizing ? 'not-allowed' : 'pointer'
+            })}
           >
             {isOptimizing ? 'Optimizing...' : 'Optimize Schedule'}
           </button>

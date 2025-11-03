@@ -1,6 +1,7 @@
 import { Dose } from '../data/estradiolEsters';
 import { PRESETS } from '../data/presets';
 import { Z_INDEX } from '../constants/defaults';
+import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS } from '../constants/styles';
 
 interface PresetsMenuProps {
   isOpen: boolean;
@@ -26,18 +27,18 @@ const PresetsMenu: React.FC<PresetsMenuProps> = ({ isOpen, onClose, onSelectPres
       />
       <div
         style={{
-          position: 'absolute',
+          position: 'absolute' as const,
           top: '100%',
           left: 0,
-          marginTop: '4px',
-          backgroundColor: 'white',
-          border: '1px solid #dee2e6',
-          borderRadius: '6px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          marginTop: SPACING.xs,
+          backgroundColor: COLORS.white,
+          border: `1px solid ${COLORS.gray300}`,
+          borderRadius: BORDER_RADIUS.md,
+          boxShadow: SHADOWS.lg,
           zIndex: Z_INDEX.MODAL_CONTENT,
           minWidth: '280px',
           maxHeight: '400px',
-          overflowY: 'auto'
+          overflowY: 'auto' as const
         }}
       >
         {PRESETS.map(preset => (
@@ -49,22 +50,22 @@ const PresetsMenu: React.FC<PresetsMenuProps> = ({ isOpen, onClose, onSelectPres
             }}
             style={{
               width: '100%',
-              padding: '10px 14px',
-              textAlign: 'left',
+              padding: `${SPACING.lg} ${SPACING.md}`,
+              textAlign: 'left' as const,
               border: 'none',
-              borderBottom: '1px solid #f0f0f0',
-              backgroundColor: 'white',
+              borderBottom: `1px solid ${COLORS.gray100}`,
+              backgroundColor: COLORS.white,
               cursor: 'pointer',
-              fontSize: '13px',
+              fontSize: TYPOGRAPHY.fontSize.base,
               transition: 'background-color 0.15s'
             }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = COLORS.gray50}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = COLORS.white}
           >
-            <div style={{ fontWeight: '600', color: '#212529', marginBottom: '2px' }}>
+            <div style={{ fontWeight: TYPOGRAPHY.fontWeight.semibold, color: COLORS.gray900, marginBottom: '2px' }}>
               {preset.name}
             </div>
-            <div style={{ fontSize: '11px', color: '#6c757d' }}>
+            <div style={{ fontSize: TYPOGRAPHY.fontSize.xs, color: COLORS.gray600 }}>
               {preset.description}
             </div>
           </button>

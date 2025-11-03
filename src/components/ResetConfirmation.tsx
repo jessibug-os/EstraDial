@@ -1,4 +1,5 @@
 import { Z_INDEX } from '../constants/defaults';
+import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS, BUTTON_STYLES, mergeStyles } from '../constants/styles';
 
 interface ResetConfirmationProps {
   isOpen: boolean;
@@ -30,25 +31,25 @@ const ResetConfirmation: React.FC<ResetConfirmationProps> = ({
       />
       <div
         style={{
-          position: 'absolute',
+          position: 'absolute' as const,
           top: '100%',
           left: '50%',
           transform: 'translateX(-50%)',
-          marginTop: '8px',
-          backgroundColor: 'white',
-          padding: '16px',
-          borderRadius: '8px',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+          marginTop: SPACING.md,
+          backgroundColor: COLORS.white,
+          padding: SPACING['2xl'],
+          borderRadius: BORDER_RADIUS.lg,
+          boxShadow: SHADOWS.lg,
           width: '280px',
           zIndex: Z_INDEX.MODAL_CONTENT,
-          border: '1px solid #dee2e6'
+          border: `1px solid ${COLORS.gray300}`
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Arrow */}
         <div
           style={{
-            position: 'absolute',
+            position: 'absolute' as const,
             top: '-6px',
             left: '50%',
             transform: 'translateX(-50%)',
@@ -56,12 +57,12 @@ const ResetConfirmation: React.FC<ResetConfirmationProps> = ({
             height: 0,
             borderLeft: '6px solid transparent',
             borderRight: '6px solid transparent',
-            borderBottom: '6px solid #dee2e6'
+            borderBottom: `6px solid ${COLORS.gray300}`
           }}
         />
         <div
           style={{
-            position: 'absolute',
+            position: 'absolute' as const,
             top: '-5px',
             left: '50%',
             transform: 'translateX(-50%)',
@@ -69,30 +70,24 @@ const ResetConfirmation: React.FC<ResetConfirmationProps> = ({
             height: 0,
             borderLeft: '6px solid transparent',
             borderRight: '6px solid transparent',
-            borderBottom: '6px solid white'
+            borderBottom: `6px solid ${COLORS.white}`
           }}
         />
 
-        <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>
+        <div style={{ fontSize: TYPOGRAPHY.fontSize.md, fontWeight: TYPOGRAPHY.fontWeight.semibold, marginBottom: SPACING.md }}>
           Clear all injections?
         </div>
-        <div style={{ fontSize: '13px', color: '#6c757d', marginBottom: '16px' }}>
+        <div style={{ fontSize: TYPOGRAPHY.fontSize.base, color: COLORS.gray600, marginBottom: SPACING['2xl'] }}>
           This will remove all {doseCount} injection{doseCount !== 1 ? 's' : ''}.
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: SPACING.md }}>
           <button
             onClick={onClose}
-            style={{
+            style={mergeStyles(BUTTON_STYLES.base, BUTTON_STYLES.secondary, {
               flex: 1,
-              padding: '8px',
-              backgroundColor: '#f8f9fa',
-              color: '#495057',
-              border: '1px solid #dee2e6',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '13px',
-              fontWeight: '500'
-            }}
+              padding: SPACING.md,
+              fontSize: TYPOGRAPHY.fontSize.base
+            })}
           >
             Cancel
           </button>
@@ -101,17 +96,11 @@ const ResetConfirmation: React.FC<ResetConfirmationProps> = ({
               onConfirm();
               onClose();
             }}
-            style={{
+            style={mergeStyles(BUTTON_STYLES.base, BUTTON_STYLES.danger, {
               flex: 1,
-              padding: '8px',
-              backgroundColor: '#c77a9b',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '13px',
-              fontWeight: '500'
-            }}
+              padding: SPACING.md,
+              fontSize: TYPOGRAPHY.fontSize.base
+            })}
           >
             Clear All
           </button>

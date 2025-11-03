@@ -11,6 +11,7 @@ import {
 import { ConcentrationPoint } from '../utils/pharmacokinetics';
 import { generateReferenceCycle, ReferenceCycleType, REFERENCE_CYCLES } from '../data/referenceData';
 import { useDebouncedInput } from '../hooks/useDebounce';
+import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, INPUT_STYLES, mergeStyles } from '../constants/styles';
 
 interface ConcentrationGraphProps {
   data: ConcentrationPoint[];
@@ -128,23 +129,23 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({
   };
 
   return (
-    <div style={{ marginTop: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '10px' }}>
+    <div style={{ marginTop: SPACING['3xl'] }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.lg, flexWrap: 'wrap' as const, gap: SPACING.lg }}>
         <h3 style={{ margin: 0 }}>Estradiol Concentration Over Time</h3>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <label style={{ fontSize: '13px', color: '#6c757d' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: SPACING.xl, flexWrap: 'wrap' as const }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: SPACING.sm }}>
+            <label style={{ fontSize: TYPOGRAPHY.fontSize.base, color: COLORS.gray600 }}>
               Reference:
             </label>
             <select
               value={referenceCycleType}
               onChange={(e) => onReferenceCycleTypeChange(e.target.value as ReferenceCycleType)}
               style={{
-                padding: '4px 6px',
-                fontSize: '13px',
-                borderRadius: '4px',
-                border: '1px solid #ccc',
-                backgroundColor: 'white',
+                padding: `${SPACING.xs} ${SPACING.sm}`,
+                fontSize: TYPOGRAPHY.fontSize.base,
+                borderRadius: BORDER_RADIUS.sm,
+                border: `1px solid ${COLORS.gray400}`,
+                backgroundColor: COLORS.white,
                 cursor: 'pointer'
               }}
               title={currentCycleInfo?.description}
@@ -156,8 +157,8 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({
               ))}
             </select>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <label style={{ fontSize: '13px', color: '#6c757d' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: SPACING.sm }}>
+            <label style={{ fontSize: TYPOGRAPHY.fontSize.base, color: COLORS.gray600 }}>
               Display:
             </label>
             <input
@@ -175,24 +176,21 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({
                 }
               }}
               min="1"
-              style={{
-                width: '60px',
-                padding: '4px 6px',
-                fontSize: '13px',
-                borderRadius: '4px',
-                border: '1px solid #ccc'
-              }}
+              style={mergeStyles(INPUT_STYLES.base, INPUT_STYLES.number, {
+                padding: `${SPACING.xs} ${SPACING.sm}`,
+                fontSize: TYPOGRAPHY.fontSize.base
+              })}
             />
-            <span style={{ fontSize: '13px', color: '#6c757d' }}>days</span>
+            <span style={{ fontSize: TYPOGRAPHY.fontSize.base, color: COLORS.gray600 }}>days</span>
           </div>
         </div>
       </div>
 
       {currentCycleInfo && (
         <div style={{
-          fontSize: '12px',
-          color: '#666',
-          marginBottom: '10px',
+          fontSize: TYPOGRAPHY.fontSize.sm,
+          color: COLORS.gray600,
+          marginBottom: SPACING.lg,
           fontStyle: 'italic'
         }}>
           {currentCycleInfo.description} — Source: {currentCycleInfo.source}
@@ -231,7 +229,7 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({
           <Line
             type="monotone"
             dataKey="concentration"
-            stroke="#b794f6"
+            stroke={COLORS.chartPrimary}
             strokeWidth={2}
             dot={false}
             name="Estradiol Ester"
@@ -239,7 +237,7 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({
           <Line
             type="monotone"
             dataKey="reference"
-            stroke="#ff7300"
+            stroke={COLORS.chartReference}
             strokeWidth={2}
             dot={false}
             strokeDasharray="5 5"

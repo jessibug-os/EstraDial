@@ -1,5 +1,6 @@
 import { Dose, ESTRADIOL_ESTERS } from '../data/estradiolEsters';
 import { formatNumber } from '../utils/formatters';
+import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS, BUTTON_STYLES, INPUT_STYLES, mergeStyles } from '../constants/styles';
 
 interface DoseEditorProps {
   selectedDoseData: Dose | null;
@@ -18,32 +19,32 @@ const DoseEditor: React.FC<DoseEditorProps> = ({
 }) => {
   return (
     <div style={{
-      padding: '20px',
-      backgroundColor: selectedDoseData ? '#f3eeff' : '#ffffff',
-      border: `1px solid ${selectedDoseData ? '#d8c7f0' : '#dee2e6'}`,
-      borderRadius: '8px',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+      padding: SPACING['3xl'],
+      backgroundColor: selectedDoseData ? COLORS.selectedHighlight : COLORS.white,
+      border: `1px solid ${selectedDoseData ? COLORS.selectedBorder : COLORS.gray300}`,
+      borderRadius: BORDER_RADIUS.lg,
+      boxShadow: SHADOWS.md,
       height: '454px',
-      overflowY: 'auto',
+      overflowY: 'auto' as const,
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column' as const
     }}>
       {selectedDoseData ? (
         <>
-          <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>Edit Injection - Day {selectedDoseData.day}</h4>
+          <h4 style={{ margin: `0 0 ${SPACING['2xl']} 0`, fontSize: TYPOGRAPHY.fontSize.lg, fontWeight: TYPOGRAPHY.fontWeight.semibold }}>Edit Injection - Day {selectedDoseData.day}</h4>
 
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Estradiol Ester:</label>
+          <div style={{ marginBottom: SPACING['2xl'] }}>
+            <label style={{ display: 'block', marginBottom: SPACING.md, fontWeight: TYPOGRAPHY.fontWeight.semibold, fontSize: TYPOGRAPHY.fontSize.md }}>Estradiol Ester:</label>
             <select
               value={selectedDoseData.ester.name}
               onChange={(e) => onUpdateDoseEster(selectedDoseData.day, e.target.value)}
               style={{
                 width: '100%',
-                padding: '8px',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                fontSize: '14px',
-                backgroundColor: 'white'
+                padding: SPACING.md,
+                border: `1px solid ${COLORS.gray400}`,
+                borderRadius: BORDER_RADIUS.sm,
+                fontSize: TYPOGRAPHY.fontSize.md,
+                backgroundColor: COLORS.white
               }}
             >
               {ESTRADIOL_ESTERS.map((ester) => (
@@ -54,9 +55,9 @@ const DoseEditor: React.FC<DoseEditorProps> = ({
             </select>
           </div>
 
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Dose (mg):</label>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ marginBottom: SPACING['2xl'] }}>
+            <label style={{ display: 'block', marginBottom: SPACING.md, fontWeight: TYPOGRAPHY.fontWeight.semibold, fontSize: TYPOGRAPHY.fontSize.md }}>Dose (mg):</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: SPACING.md }}>
               <input
                 type="number"
                 value={formatNumber(selectedDoseData.dose)}
@@ -64,21 +65,15 @@ const DoseEditor: React.FC<DoseEditorProps> = ({
                 step="0.1"
                 min="0"
                 max="20"
-                style={{
-                  width: '80px',
-                  padding: '8px',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px',
-                  fontSize: '14px'
-                }}
+                style={mergeStyles(INPUT_STYLES.base, INPUT_STYLES.numberLarge)}
               />
-              <span style={{ color: '#666', fontSize: '14px' }}>mg</span>
+              <span style={{ color: COLORS.gray600, fontSize: TYPOGRAPHY.fontSize.md }}>mg</span>
             </div>
           </div>
 
-          <div style={{ marginBottom: '20px', padding: '12px', backgroundColor: '#e8dff5', borderRadius: '4px' }}>
-            <div style={{ fontSize: '12px', fontWeight: '600', marginBottom: '8px', color: '#5a3d7a' }}>Pharmacokinetic Parameters:</div>
-            <div style={{ fontSize: '12px', color: '#6c757d' }}>
+          <div style={{ marginBottom: SPACING['3xl'], padding: SPACING.xl, backgroundColor: COLORS.parameterBackground, borderRadius: BORDER_RADIUS.sm }}>
+            <div style={{ fontSize: TYPOGRAPHY.fontSize.sm, fontWeight: TYPOGRAPHY.fontWeight.semibold, marginBottom: SPACING.md, color: COLORS.parameterText }}>Pharmacokinetic Parameters:</div>
+            <div style={{ fontSize: TYPOGRAPHY.fontSize.sm, color: COLORS.gray600 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                 <span>D:</span>
                 <span style={{ fontFamily: 'monospace' }}>{selectedDoseData.ester.D.toExponential(2)}</span>
@@ -98,34 +93,20 @@ const DoseEditor: React.FC<DoseEditorProps> = ({
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column' as const, gap: SPACING.lg }}>
             <button
               onClick={onClose}
-              style={{
-                padding: '10px 16px',
-                backgroundColor: '#8b72b8',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '500'
-              }}
+              style={mergeStyles(BUTTON_STYLES.base, BUTTON_STYLES.primary, {
+                borderRadius: BORDER_RADIUS.md
+              })}
             >
               Done
             </button>
             <button
               onClick={() => onRemoveDose(selectedDoseData.day)}
-              style={{
-                padding: '10px 16px',
-                backgroundColor: '#c77a9b',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '500'
-              }}
+              style={mergeStyles(BUTTON_STYLES.base, BUTTON_STYLES.danger, {
+                borderRadius: BORDER_RADIUS.md
+              })}
             >
               Remove
             </button>
@@ -133,11 +114,11 @@ const DoseEditor: React.FC<DoseEditorProps> = ({
         </>
       ) : (
         <>
-          <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>Instructions</h4>
-          <p style={{ fontSize: '14px', color: '#6c757d', lineHeight: '1.6' }}>
+          <h4 style={{ margin: `0 0 ${SPACING['2xl']} 0`, fontSize: TYPOGRAPHY.fontSize.lg, fontWeight: TYPOGRAPHY.fontWeight.semibold }}>Instructions</h4>
+          <p style={{ fontSize: TYPOGRAPHY.fontSize.md, color: COLORS.gray600, lineHeight: TYPOGRAPHY.lineHeight.relaxed }}>
             Click on any day in the calendar to add an injection. Click on an existing injection to edit its dose and ester type.
           </p>
-          <p style={{ fontSize: '14px', color: '#6c757d', lineHeight: '1.6', marginTop: '12px' }}>
+          <p style={{ fontSize: TYPOGRAPHY.fontSize.md, color: COLORS.gray600, lineHeight: TYPOGRAPHY.lineHeight.relaxed, marginTop: SPACING.xl }}>
             Each injection can use a different estradiol ester with unique pharmacokinetic properties.
           </p>
         </>
