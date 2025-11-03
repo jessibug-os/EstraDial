@@ -116,7 +116,7 @@ export async function optimizeSchedule(
 
   // Start with a reasonable initial schedule
   const candidateDays = generateCandidateDays(scheduleLength, maxInjectionsPerCycle);
-  const primaryEster = availableEsters[0]; // Start with first available ester
+  const primaryEster = availableEsters[0]!; // Start with first available ester (validated above)
 
   // Initialize with evenly distributed doses
   // Start with 0.15 mL as a reasonable starting volume
@@ -134,14 +134,10 @@ export async function optimizeSchedule(
   let iterations = 0;
   let learningRate = 0.5;
 
-  console.log(`Starting optimization with maxInjectionsPerCycle=${maxInjectionsPerCycle}, initial doses: ${currentDoses.length}`);
-
   // Optimization loop - run until no improvement found
   while (true) {
     iterations++;
     let improved = false;
-
-    console.log(`Iteration ${iterations}, current score: ${currentScore.toFixed(2)}, doses: ${currentDoses.map(d => `${d.dose.toFixed(2)}mg ${d.ester.name}`).join(', ')}`);
 
     // Report progress and yield to event loop for UI updates
     if (onProgress) {
@@ -156,7 +152,6 @@ export async function optimizeSchedule(
     // Try removing injections if we're over the limit
     // Only remove ONE dose per iteration to avoid cascading removals
     if (currentDoses.length > maxInjectionsPerCycle) {
-      console.log(`  Over limit (${currentDoses.length} > ${maxInjectionsPerCycle}), removing best dose to remove...`);
       let bestRemovalScore = Infinity;
       let bestRemovalIndex = -1;
 
@@ -174,7 +169,6 @@ export async function optimizeSchedule(
 
       // Apply the best removal found
       if (bestRemovalIndex >= 0) {
-        console.log(`  ✓ Removing dose ${bestRemovalIndex}: score ${currentScore.toFixed(2)} -> ${bestRemovalScore.toFixed(2)}`);
         currentDoses = currentDoses.filter((_, idx) => idx !== bestRemovalIndex);
         currentScore = bestRemovalScore;
         improved = true;
@@ -183,8 +177,9 @@ export async function optimizeSchedule(
 
     // Try adjusting each dose (in mL increments)
     for (let i = 0; i < currentDoses.length; i++) {
-      const originalDose = currentDoses[i].dose;
-      const ester = currentDoses[i].ester;
+      const dose = currentDoses[i]!;
+      const originalDose = dose.dose;
+      const ester = dose.ester;
       const concentration = esterConcentrations[ester.name] || 40;
 
       // Convert to mL for adjustment
@@ -200,19 +195,18 @@ export async function optimizeSchedule(
 
         if (testDose > maxDosePerInjection) break; // Hit max dose
 
-        currentDoses[i].dose = testDose;
+        currentDoses[i]!.dose = testDose;
         const newScore = calculateMSE(currentDoses, referenceData, scheduleLength, steadyState);
 
         if (newScore < bestScore) {
           bestScore = newScore;
           bestDose = testDose;
           improved = true;
-          console.log(`  Dose ${i}: found better by increasing to ${testVolumeMl.toFixed(3)}mL (${testDose.toFixed(2)}mg), score ${newScore.toFixed(2)}`);
         }
       }
 
       // Reset to original before testing decreases
-      currentDoses[i].dose = originalDose;
+      currentDoses[i]!.dose = originalDose;
 
       // Try decreasing volume by mL granularity increments
       for (let numSteps = 1; numSteps <= 10; numSteps++) {
@@ -221,52 +215,49 @@ export async function optimizeSchedule(
 
         if (testDose < minDosePerInjection) break; // Hit min dose
 
-        currentDoses[i].dose = testDose;
+        currentDoses[i]!.dose = testDose;
         const newScore = calculateMSE(currentDoses, referenceData, scheduleLength, steadyState);
 
         if (newScore < bestScore) {
           bestScore = newScore;
           bestDose = testDose;
           improved = true;
-          console.log(`  Dose ${i}: found better by decreasing to ${testVolumeMl.toFixed(3)}mL (${testDose.toFixed(2)}mg), score ${newScore.toFixed(2)}`);
         }
       }
 
       // Set to best found
-      currentDoses[i].dose = bestDose;
+      currentDoses[i]!.dose = bestDose;
       currentScore = bestScore;
     }
 
     // Try different esters if multiple available
     if (availableEsters.length > 1) {
       for (let i = 0; i < currentDoses.length; i++) {
-        const originalEster = currentDoses[i].ester;
+        const originalEster = currentDoses[i]!.ester;
         let bestEster = originalEster;
         let bestEsterScore = currentScore;
 
         for (const ester of availableEsters) {
           if (ester.name === originalEster.name) continue;
 
-          currentDoses[i].ester = ester;
+          currentDoses[i]!.ester = ester;
           const newScore = calculateMSE(currentDoses, referenceData, scheduleLength, steadyState);
 
           if (newScore < bestEsterScore) {
             bestEsterScore = newScore;
             bestEster = ester;
             improved = true;
-            console.log(`  Dose ${i}: found better ester ${ester.name}, score ${newScore.toFixed(2)}`);
           }
         }
 
         // Apply best ester found
-        currentDoses[i].ester = bestEster;
+        currentDoses[i]!.ester = bestEster;
         currentScore = bestEsterScore;
       }
     }
 
     // Early stopping if no improvement
     if (!improved) {
-      console.log(`Optimizer stopping at iteration ${iterations}, final score: ${currentScore}, doses: ${currentDoses.length}`);
       break;
     }
 

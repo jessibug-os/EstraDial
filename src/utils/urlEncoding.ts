@@ -83,12 +83,14 @@ export function decodeSchedule(encoded: string): ScheduleData | null {
       const doseParts = dosesStr.split(';');
       for (const dosePart of doseParts) {
         const [dayStr, doseStr, esterStr] = dosePart.split(',');
+        if (!dayStr || !doseStr || !esterStr) continue;
+
         const day = parseInt(dayStr);
         const dose = parseInt(doseStr) / 100;
         const esterIndex = parseInt(esterStr);
-        const ester = ESTRADIOL_ESTERS[esterIndex] || ESTRADIOL_ESTERS[1];
+        const ester = ESTRADIOL_ESTERS[esterIndex] || ESTRADIOL_ESTERS[1]!;
 
-        if (!isNaN(day) && !isNaN(dose)) {
+        if (!isNaN(day) && !isNaN(dose) && ester) {
           doses.push({ day, dose, ester });
         }
       }
@@ -96,10 +98,10 @@ export function decodeSchedule(encoded: string): ScheduleData | null {
 
     return {
       doses,
-      scheduleLength: parseInt(schedLenStr) || 29,
-      graphDays: parseInt(graphDaysStr) || 90,
+      scheduleLength: parseInt(schedLenStr || '29') || 29,
+      graphDays: parseInt(graphDaysStr || '90') || 90,
       repeat: repeatStr === '1',
-      cycleType: CYCLE_TYPE_REVERSE[cycleStr] || 'typical'
+      cycleType: (cycleStr && CYCLE_TYPE_REVERSE[cycleStr]) || 'typical'
     };
   } catch (e) {
     return null;

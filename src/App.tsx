@@ -181,7 +181,6 @@ function App() {
         onSteadyStateChange={setSteadyState}
         referenceCycleType={referenceCycleType}
         esterConcentrations={esterConcentrations}
-        onEsterConcentrationsChange={setEsterConcentrations}
       />
       <ConcentrationGraph
         data={concentrationData}

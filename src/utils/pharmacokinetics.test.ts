@@ -32,8 +32,8 @@ describe('generateTimePoints', () => {
 });
 
 describe('calculateConcentration', () => {
-  const EV = ESTRADIOL_ESTERS[1]; // Estradiol valerate
-  const EC = ESTRADIOL_ESTERS[2]; // Estradiol cypionate
+  const EV = ESTRADIOL_ESTERS[1]!; // Estradiol valerate
+  const EC = ESTRADIOL_ESTERS[2]!; // Estradiol cypionate
 
   describe('basic calculation', () => {
     it('should return 0 before injection day', () => {
@@ -104,7 +104,7 @@ describe('calculateConcentration', () => {
       }
 
       const peak = Math.max(...concentrations);
-      const injectionConc = concentrations[0];
+      const injectionConc = concentrations[0]!;
 
       expect(peak).toBeGreaterThan(injectionConc);
     });
@@ -137,7 +137,7 @@ describe('calculateConcentration', () => {
 });
 
 describe('calculateTotalConcentration', () => {
-  const EV = ESTRADIOL_ESTERS[1];
+  const EV = ESTRADIOL_ESTERS[1]!;
 
   describe('single dose', () => {
     it('should handle single dose correctly', () => {
@@ -180,11 +180,11 @@ describe('calculateTotalConcentration', () => {
       const conc2 = calculateConcentration(4, 3, 5, EV);
       const expected = conc1 + conc2;
 
-      expect(result[0].concentration).toBeCloseTo(expected, 10);
+      expect(result[0]!.concentration).toBeCloseTo(expected, 10);
     });
 
     it('should handle doses with different esters', () => {
-      const EC = ESTRADIOL_ESTERS[2];
+      const EC = ESTRADIOL_ESTERS[2]!;
       const doses = [
         { day: 0, dose: 5, ester: EV },
         { day: 3, dose: 5, ester: EC },
@@ -193,8 +193,8 @@ describe('calculateTotalConcentration', () => {
 
       const result = calculateTotalConcentration(doses, timePoints);
 
-      expect(result[0].concentration).toBeGreaterThan(0);
-      expect(Number.isFinite(result[0].concentration)).toBe(true);
+      expect(result[0]!.concentration).toBeGreaterThan(0);
+      expect(Number.isFinite(result[0]!.concentration)).toBe(true);
     });
 
     it('should handle empty doses array', () => {
@@ -252,8 +252,8 @@ describe('calculateTotalConcentration', () => {
 
       const result = calculateTotalConcentration(doses, timePoints);
 
-      expect(result[0].concentration).toBeGreaterThan(0);
-      expect(Number.isFinite(result[0].concentration)).toBe(true);
+      expect(result[0]!.concentration).toBeGreaterThan(0);
+      expect(Number.isFinite(result[0]!.concentration)).toBe(true);
     });
 
     it('should handle very small doses', () => {
@@ -262,8 +262,8 @@ describe('calculateTotalConcentration', () => {
 
       const result = calculateTotalConcentration(doses, timePoints);
 
-      expect(result[0].concentration).toBeGreaterThan(0);
-      expect(result[0].concentration).toBeLessThan(1);
+      expect(result[0]!.concentration).toBeGreaterThan(0);
+      expect(result[0]!.concentration).toBeLessThan(1);
     });
 
     it('should handle doses far apart in time', () => {
@@ -276,10 +276,10 @@ describe('calculateTotalConcentration', () => {
       const result = calculateTotalConcentration(doses, timePoints);
 
       // At t=500, only first dose contributes (should be ~0)
-      expect(result[0].concentration).toBeLessThan(1);
+      expect(result[0]!.concentration).toBeLessThan(1);
 
       // At t=1001, second dose should contribute
-      expect(result[1].concentration).toBeGreaterThan(0);
+      expect(result[1]!.concentration).toBeGreaterThan(0);
     });
   });
 });

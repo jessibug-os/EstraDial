@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Dose, ESTRADIOL_ESTERS, EstradiolEster } from '../data/estradiolEsters';
 import { PRESETS } from '../data/presets';
 import { optimizeSchedule } from '../utils/scheduleOptimizer';
@@ -19,8 +19,6 @@ interface VisualTimelineProps {
   onSteadyStateChange: (steadyState: boolean) => void;
   referenceCycleType: ReferenceCycleType;
   esterConcentrations: Record<string, number>;
-  onEsterConcentrationsChange: (concentrations: Record<string, number>) => void;
-  maxDays?: number;
 }
 
 const VisualTimeline: React.FC<VisualTimelineProps> = ({
@@ -33,9 +31,7 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
   steadyState,
   onSteadyStateChange,
   referenceCycleType,
-  esterConcentrations,
-  onEsterConcentrationsChange,
-  maxDays = 120
+  esterConcentrations
 }) => {
   const [selectedDose, setSelectedDose] = useState<number | null>(null);
   const [scheduleInputValue, setScheduleInputValue] = useDebouncedInput(
@@ -51,7 +47,9 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
   const [showResetModal, setShowResetModal] = useState(false);
   const [showPresetsMenu, setShowPresetsMenu] = useState(false);
   const [showOptimizerModal, setShowOptimizerModal] = useState(false);
-  const [selectedEsters, setSelectedEsters] = useState<EstradiolEster[]>([ESTRADIOL_ESTERS[1]]);
+  // Default to Estradiol valerate for optimizer
+  const DEFAULT_OPTIMIZER_ESTER = ESTRADIOL_ESTERS[1] || ESTRADIOL_ESTERS[0]!;
+  const [selectedEsters, setSelectedEsters] = useState<EstradiolEster[]>([DEFAULT_OPTIMIZER_ESTER]);
   const [maxInjections, setMaxInjections] = useState<number>(7);
   const [maxInjectionsInput, setMaxInjectionsInput] = useDebouncedInput(
     '7',
@@ -88,9 +86,9 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
   }, [viewDays, doses, previousViewDays, selectedDose, onDosesChange]);
 
   // Default to Estradiol valerate for new injections
-  const DEFAULT_ESTER = ESTRADIOL_ESTERS[1];
+  const DEFAULT_ESTER = ESTRADIOL_ESTERS[1] || ESTRADIOL_ESTERS[0]!;
 
-  const addOrUpdateDose = (day: number, dose: number = 6, ester = DEFAULT_ESTER) => {
+  const addOrUpdateDose = (day: number, dose: number = 6, ester: EstradiolEster = DEFAULT_ESTER) => {
     const existingIndex = doses.findIndex(d => d.day === day);
     let newDoses = [...doses];
 
@@ -785,7 +783,7 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
                             maxInjectionsPerCycle: maxInjections,
                             esterConcentrations
                           },
-                          (progress, score, iteration) => {
+                          (progress, score) => {
                             setOptimizationProgress(Math.round(progress));
                             setOptimizationScore(score);
                           }

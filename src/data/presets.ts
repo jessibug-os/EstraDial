@@ -9,9 +9,9 @@ export interface Preset {
   repeat?: boolean; // Whether to enable repeat mode
 }
 
-const EV = ESTRADIOL_ESTERS[1]; // Estradiol valerate
-const EC = ESTRADIOL_ESTERS[2]; // Estradiol cypionate
-const EEn = ESTRADIOL_ESTERS[4]; // Estradiol enanthate
+const EV = ESTRADIOL_ESTERS[1]!; // Estradiol valerate
+const EC = ESTRADIOL_ESTERS[2]!; // Estradiol cypionate
+const EEn = ESTRADIOL_ESTERS[4]!; // Estradiol enanthate
 
 export const PRESETS: Preset[] = [
   {

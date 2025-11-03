@@ -65,18 +65,20 @@ export const ESTRADIOL_ESTERS: EstradiolEster[] = [
 ];
 
 // Default schedule uses Estradiol valerate
+const EV = ESTRADIOL_ESTERS[1]!; // Estradiol valerate is always at index 1
+
 export const DEFAULT_DOSES: Dose[] = [
-  { day: 1, dose: 0.75, ester: ESTRADIOL_ESTERS[1] },
-  { day: 3, dose: 0.75, ester: ESTRADIOL_ESTERS[1] },
-  { day: 5, dose: 1, ester: ESTRADIOL_ESTERS[1] },
-  { day: 7, dose: 1, ester: ESTRADIOL_ESTERS[1] },
-  { day: 9, dose: 1.25, ester: ESTRADIOL_ESTERS[1] },
-  { day: 11, dose: 2, ester: ESTRADIOL_ESTERS[1] },
-  { day: 13, dose: 0.5, ester: ESTRADIOL_ESTERS[1] },
-  { day: 17, dose: 0.5, ester: ESTRADIOL_ESTERS[1] },
-  { day: 19, dose: 0.75, ester: ESTRADIOL_ESTERS[1] },
-  { day: 21, dose: 1, ester: ESTRADIOL_ESTERS[1] },
-  { day: 23, dose: 0.75, ester: ESTRADIOL_ESTERS[1] },
-  { day: 25, dose: 0.5, ester: ESTRADIOL_ESTERS[1] },
-  { day: 27, dose: 0.5, ester: ESTRADIOL_ESTERS[1] },
+  { day: 1, dose: 0.75, ester: EV },
+  { day: 3, dose: 0.75, ester: EV },
+  { day: 5, dose: 1, ester: EV },
+  { day: 7, dose: 1, ester: EV },
+  { day: 9, dose: 1.25, ester: EV },
+  { day: 11, dose: 2, ester: EV },
+  { day: 13, dose: 0.5, ester: EV },
+  { day: 17, dose: 0.5, ester: EV },
+  { day: 19, dose: 0.75, ester: EV },
+  { day: 21, dose: 1, ester: EV },
+  { day: 23, dose: 0.75, ester: EV },
+  { day: 25, dose: 0.5, ester: EV },
+  { day: 27, dose: 0.5, ester: EV },
 ];
