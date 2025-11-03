@@ -158,7 +158,9 @@ function App() {
 
       <header style={{ marginBottom: '30px', textAlign: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '15px' }}>
-          <img src={process.env.PUBLIC_URL + '/favicon.png'} alt="Shimeji mascot" style={{ width: '48px', height: '48px' }} />
+          <a href="https://github.com/jessibug-os" target="_blank" rel="noopener noreferrer" title="Visit jessibug-os on GitHub">
+            <img src={process.env.PUBLIC_URL + '/favicon.png'} alt="Shimeji mascot" style={{ width: '48px', height: '48px', cursor: 'pointer' }} />
+          </a>
           <h1 style={{ margin: 0 }}>Estradiol Ester Pharmacokinetic Calculator</h1>
         </div>
         <p style={{ marginTop: '10px' }}>Calculate and visualize estradiol concentration over time based on injection schedule</p>
