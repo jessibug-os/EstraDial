@@ -10,6 +10,7 @@ import { ReferenceCycleType } from './data/referenceData';
 import { encodeSchedule, decodeSchedule, decodeLegacySchedule } from './utils/urlEncoding';
 import { PHARMACOKINETICS, DEFAULTS } from './constants/pharmacokinetics';
 import { DEFAULT_ESTER_CONCENTRATIONS, Z_INDEX } from './constants/defaults';
+import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, BUTTON_STYLES, INPUT_STYLES, MODAL_STYLES, mergeStyles } from './constants/styles';
 import VisualTimeline from './components/VisualTimeline';
 import ConcentrationGraph from './components/ConcentrationGraph';
 
@@ -127,14 +128,14 @@ function App() {
         }}
         style={{
           position: 'absolute',
-          top: '20px',
-          right: '20px',
-          padding: '8px',
-          fontSize: '20px',
+          top: SPACING['3xl'],
+          right: SPACING['3xl'],
+          padding: SPACING.md,
+          fontSize: TYPOGRAPHY.fontSize['2xl'],
           backgroundColor: 'transparent',
-          color: '#6c757d',
+          color: COLORS.gray600,
           border: 'none',
-          borderRadius: '4px',
+          borderRadius: BORDER_RADIUS.sm,
           cursor: 'pointer',
           transition: 'all 0.15s ease',
           display: 'flex',
@@ -143,11 +144,11 @@ function App() {
           zIndex: Z_INDEX.SETTINGS_BUTTON
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.color = '#495057';
-          e.currentTarget.style.backgroundColor = '#f8f9fa';
+          e.currentTarget.style.color = COLORS.gray700;
+          e.currentTarget.style.backgroundColor = COLORS.gray50;
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.color = '#6c757d';
+          e.currentTarget.style.color = COLORS.gray600;
           e.currentTarget.style.backgroundColor = 'transparent';
         }}
         title="Settings"
@@ -197,40 +198,21 @@ function App() {
       {showSettingsModal && (
         <>
           <div
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            style={mergeStyles(MODAL_STYLES.backdrop, {
               zIndex: Z_INDEX.MODAL_BACKDROP,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
+            })}
             onClick={() => setShowSettingsModal(false)}
           />
           <div
-            style={{
-              position: 'fixed',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              backgroundColor: 'white',
-              padding: '24px',
-              borderRadius: '8px',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
+            style={mergeStyles(MODAL_STYLES.content, {
               zIndex: Z_INDEX.MODAL_ELEVATED,
-              maxWidth: '500px',
-              width: '90%',
               maxHeight: '80vh',
-              overflowY: 'auto'
-            }}
+              overflowY: 'auto' as const,
+            })}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 style={{ margin: '0 0 12px 0', fontSize: '18px' }}>Vial Concentrations</h3>
-            <p style={{ fontSize: '12px', color: '#6c757d', marginBottom: '16px' }}>
+            <h3 style={MODAL_STYLES.title}>Vial Concentrations</h3>
+            <p style={{ fontSize: TYPOGRAPHY.fontSize.sm, color: COLORS.gray600, marginBottom: SPACING['2xl'] }}>
               Set the concentration (mg/mL) for each estradiol ester.
             </p>
 
@@ -242,8 +224,8 @@ function App() {
                 marginBottom: '8px'
               }}>
                 <label style={{
-                  fontSize: '13px',
-                  fontWeight: '500',
+                  fontSize: TYPOGRAPHY.fontSize.base,
+                  fontWeight: TYPOGRAPHY.fontWeight.medium,
                   flex: '1',
                   minWidth: '0'
                 }}>
@@ -278,34 +260,20 @@ function App() {
                       });
                     }
                   }}
-                  style={{
-                    width: '80px',
-                    padding: '6px 8px',
-                    border: '1px solid #dee2e6',
-                    borderRadius: '4px',
-                    fontSize: '13px'
-                  }}
+                  style={mergeStyles(INPUT_STYLES.base, INPUT_STYLES.numberLarge, {
+                    padding: `${SPACING.sm} ${SPACING.md}`,
+                  })}
                 />
-                <span style={{ fontSize: '12px', color: '#6c757d', width: '45px' }}>mg/mL</span>
+                <span style={{ fontSize: TYPOGRAPHY.fontSize.sm, color: COLORS.gray600, width: '45px' }}>mg/mL</span>
               </div>
             ))}
 
-            <div style={{ display: 'flex', gap: '10px', marginTop: '24px' }}>
+            <div style={{ display: 'flex', gap: SPACING.lg, marginTop: SPACING['4xl'] }}>
               <button
                 onClick={() => {
                   setShowSettingsModal(false);
                 }}
-                style={{
-                  flex: 1,
-                  padding: '10px',
-                  backgroundColor: '#f8f9fa',
-                  color: '#495057',
-                  border: '1px solid #dee2e6',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500'
-                }}
+                style={mergeStyles(BUTTON_STYLES.base, BUTTON_STYLES.secondary, { flex: 1 })}
               >
                 Cancel
               </button>
@@ -314,17 +282,7 @@ function App() {
                   setEsterConcentrations(tempEsterConcentrations);
                   setShowSettingsModal(false);
                 }}
-                style={{
-                  flex: 1,
-                  padding: '10px',
-                  backgroundColor: '#b794f6',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500'
-                }}
+                style={mergeStyles(BUTTON_STYLES.base, BUTTON_STYLES.primary, { flex: 1 })}
               >
                 Save
               </button>
