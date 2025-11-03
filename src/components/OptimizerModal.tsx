@@ -5,6 +5,7 @@ import { ReferenceCycleType } from '../data/referenceData';
 import { formatNumber } from '../utils/formatters';
 import { useDebouncedInput } from '../hooks/useDebounce';
 import { parsePositiveInteger } from '../utils/validation';
+import ErrorBoundary from './ErrorBoundary';
 
 interface OptimizerModalProps {
   isOpen: boolean;
@@ -49,7 +50,47 @@ const OptimizerModal: React.FC<OptimizerModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <>
+    <ErrorBoundary
+      fallback={
+        <div
+          style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            backgroundColor: 'white',
+            padding: '24px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
+            zIndex: 1001,
+            maxWidth: '400px',
+            textAlign: 'center'
+          }}
+        >
+          <div style={{ fontSize: '32px', marginBottom: '12px' }}>⚠️</div>
+          <h3 style={{ margin: '0 0 8px 0', fontSize: '18px' }}>Optimizer Error</h3>
+          <p style={{ fontSize: '14px', color: '#6c757d', marginBottom: '16px' }}>
+            The schedule optimizer encountered an error. Please try different settings or close and try again.
+          </p>
+          <button
+            onClick={onClose}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: '#b794f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '500'
+            }}
+          >
+            Close
+          </button>
+        </div>
+      }
+    >
+      <>
       <div
         style={{
           position: 'fixed',
@@ -307,6 +348,7 @@ const OptimizerModal: React.FC<OptimizerModalProps> = ({
         </div>
       </div>
     </>
+    </ErrorBoundary>
   );
 };
 
