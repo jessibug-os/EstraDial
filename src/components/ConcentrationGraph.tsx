@@ -76,17 +76,6 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({
 
   const currentCycleInfo = REFERENCE_CYCLES.find(c => c.id === referenceCycleType);
 
-  const formatTooltip = (value: any, name: string) => {
-    if (name === 'concentration') {
-      const numValue = parseFloat(value);
-      return [`${formatNumber(numValue)} pg/mL`, 'Estradiol Ester'];
-    } else if (name === 'reference') {
-      const numValue = parseFloat(value);
-      return [`${formatNumber(numValue)} pg/mL`, currentCycleInfo?.name || 'Reference Cycle'];
-    }
-    return [value, name];
-  };
-
   const formatYAxisTick = (value: number) => {
     return formatNumber(value).toString();
   };
@@ -102,8 +91,10 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({
 
     return {
       time: point.time,
-      concentration: point.estradiolConcentration,
-      reference: referencePoint?.estradiol || null
+      estradiol: point.estradiolConcentration,
+      progesterone: point.progesteroneConcentration,
+      estradiolReference: referencePoint?.estradiol || null,
+      progesteroneReference: referencePoint?.progesterone || null
     };
   });
 
@@ -126,11 +117,11 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({
     return ticks;
   };
 
-  // Generate Y-axis ticks based on max value in data
-  const generateYTicks = () => {
+  // Generate Y-axis ticks for estradiol (left axis)
+  const generateEstradiolYTicks = () => {
     const maxConcentration = Math.max(
       ...filteredData.map(d => d.estradiolConcentration),
-      ...combinedData.map(d => d.reference || 0)
+      ...combinedData.map(d => d.estradiolReference || 0)
     );
 
     // Round up to nearest 50
@@ -150,11 +141,35 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({
     return ticks;
   };
 
+  // Generate Y-axis ticks for progesterone (right axis)
+  const generateProgesteroneYTicks = () => {
+    const maxConcentration = Math.max(
+      ...filteredData.map(d => d.progesteroneConcentration),
+      ...combinedData.map(d => d.progesteroneReference || 0)
+    );
+
+    // Round up to nearest 5
+    const maxY = Math.ceil(maxConcentration / 5) * 5;
+
+    // Generate ticks every 5 up to maxY
+    const ticks = [];
+    for (let i = 0; i <= maxY; i += 5) {
+      ticks.push(i);
+    }
+
+    // Ensure we have at least a few ticks
+    if (ticks.length < 3) {
+      return [0, 5, 10, 15, 20, 25];
+    }
+
+    return ticks;
+  };
+
   return (
     <div style={{ marginTop: SPACING['3xl'] }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.lg, flexWrap: 'wrap' as const, gap: SPACING.lg }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: SPACING.lg }}>
-          <h3 style={{ margin: 0 }}>Estradiol Concentration Over Time</h3>
+          <h3 style={{ margin: 0 }}>Hormone Concentration Over Time</h3>
 
           {/* Optimize Mode Badge */}
           {optimizeMode && (
@@ -347,7 +362,7 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({
           data={combinedData}
           margin={{
             top: 20,
-            right: 30,
+            right: 60,
             left: 20,
             bottom: 30,
           }}
@@ -359,34 +374,76 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({
             ticks={generateXTicks(viewDays)}
             domain={[0, viewDays]}
           />
+          {/* Left Y-axis for Estradiol (pg/mL) */}
           <YAxis
+            yAxisId="estradiol"
             tickFormatter={formatYAxisTick}
-            label={{ value: 'Concentration (pg/mL)', angle: -90, position: 'insideLeft' }}
+            label={{ value: 'Estradiol (pg/mL)', angle: -90, position: 'insideLeft' }}
             domain={[0, 'auto']}
-            ticks={generateYTicks()}
+            ticks={generateEstradiolYTicks()}
+          />
+          {/* Right Y-axis for Progesterone (ng/mL) */}
+          <YAxis
+            yAxisId="progesterone"
+            orientation="right"
+            tickFormatter={formatYAxisTick}
+            label={{ value: 'Progesterone (ng/mL)', angle: 90, position: 'insideRight' }}
+            domain={[0, 'auto']}
+            ticks={generateProgesteroneYTicks()}
           />
           <Tooltip
-            formatter={formatTooltip}
-            labelFormatter={(value) => `Day ${parseFloat(parseFloat(value).toFixed(1))}`}
+            formatter={(value, name) => {
+              const numValue = typeof value === 'number' ? value : (typeof value === 'string' ? parseFloat(value) : 0);
+              const nameStr = typeof name === 'string' ? name : '';
+              if (nameStr.includes('Progesterone')) {
+                return [`${formatNumber(numValue)} ng/mL`, nameStr];
+              }
+              return [`${formatNumber(numValue)} pg/mL`, nameStr];
+            }}
+            labelFormatter={(value) => `Day ${parseFloat(parseFloat(value as string).toFixed(1))}`}
           />
           <Legend />
 
+          {/* Estradiol lines (left axis) */}
           <Line
+            yAxisId="estradiol"
             type="monotone"
-            dataKey="concentration"
+            dataKey="estradiol"
             stroke={COLORS.chartPrimary}
             strokeWidth={2}
             dot={false}
-            name="Estradiol Ester"
+            name="Estradiol"
           />
           <Line
+            yAxisId="estradiol"
             type="monotone"
-            dataKey="reference"
+            dataKey="estradiolReference"
             stroke={COLORS.chartReference}
             strokeWidth={2}
             dot={false}
             strokeDasharray="5 5"
-            name={currentCycleInfo?.name || "Reference Cycle"}
+            name="Estradiol Reference"
+          />
+
+          {/* Progesterone lines (right axis) */}
+          <Line
+            yAxisId="progesterone"
+            type="monotone"
+            dataKey="progesterone"
+            stroke="#9333ea"
+            strokeWidth={2}
+            dot={false}
+            name="Progesterone"
+          />
+          <Line
+            yAxisId="progesterone"
+            type="monotone"
+            dataKey="progesteroneReference"
+            stroke="#c084fc"
+            strokeWidth={2}
+            dot={false}
+            strokeDasharray="5 5"
+            name="Progesterone Reference"
           />
         </LineChart>
       </ResponsiveContainer>

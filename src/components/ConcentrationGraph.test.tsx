@@ -56,7 +56,7 @@ describe('ConcentrationGraph', () => {
         />
       );
 
-      expect(screen.getByText('Estradiol Concentration Over Time')).toBeInTheDocument();
+      expect(screen.getByText('Hormone Concentration Over Time')).toBeInTheDocument();
     });
 
     it('should render reference cycle selector', () => {
@@ -263,7 +263,7 @@ describe('ConcentrationGraph', () => {
         />
       );
 
-      expect(screen.getByText('Estradiol Concentration Over Time')).toBeInTheDocument();
+      expect(screen.getByText('Hormone Concentration Over Time')).toBeInTheDocument();
     });
 
     it('should filter data to viewDays', () => {
@@ -288,7 +288,7 @@ describe('ConcentrationGraph', () => {
       // Should only show data up to day 7
       // We can't directly test the filtered data without accessing internals,
       // but we can verify the component renders without errors
-      expect(screen.getByText('Estradiol Concentration Over Time')).toBeInTheDocument();
+      expect(screen.getByText('Hormone Concentration Over Time')).toBeInTheDocument();
 
       // Change viewDays
       rerender(
@@ -319,7 +319,7 @@ describe('ConcentrationGraph', () => {
         />
       );
 
-      expect(screen.getByText('Estradiol Concentration Over Time')).toBeInTheDocument();
+      expect(screen.getByText('Hormone Concentration Over Time')).toBeInTheDocument();
     });
 
     it('should handle very large concentrations', () => {
@@ -339,7 +339,7 @@ describe('ConcentrationGraph', () => {
         />
       );
 
-      expect(screen.getByText('Estradiol Concentration Over Time')).toBeInTheDocument();
+      expect(screen.getByText('Hormone Concentration Over Time')).toBeInTheDocument();
     });
   });
 
