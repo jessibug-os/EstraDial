@@ -69,6 +69,8 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
   const DEFAULT_ESTER = ESTRADIOL_ESTERS[1] || ESTRADIOL_ESTERS[0]!;
 
   const addOrUpdateDose = (day: number, dose: number = 6, ester: EstradiolMedication = DEFAULT_ESTER) => {
+    // For now, we still update the first dose on the day if it exists (backward compatibility)
+    // Later we can add UI to add multiple doses per day
     const existingIndex = doses.findIndex(d => d.day === day);
     let newDoses = [...doses];
 
@@ -83,15 +85,23 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
   };
 
   const removeDose = (day: number) => {
+    // Remove all doses on this day
     const newDoses = doses.filter(d => d.day !== day);
     onDosesChange(newDoses);
     setSelectedDose(null);
   };
 
   const updateDoseAmount = (day: number, newDose: number) => {
-    const newDoses = doses.map(d =>
-      d.day === day ? { ...d, dose: newDose } : d
-    );
+    // Update the first dose on this day (backward compatibility)
+    const dayDoses = doses.filter(d => d.day === day);
+    if (dayDoses.length === 0) return;
+
+    const newDoses = doses.map(d => {
+      if (d.day === day && d === dayDoses[0]) {
+        return { ...d, dose: newDose };
+      }
+      return d;
+    });
     onDosesChange(newDoses);
   };
 
@@ -99,9 +109,16 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
     const ester = ESTRADIOL_ESTERS.find(e => e.name === esterName);
     if (!ester) return;
 
-    const newDoses = doses.map(d =>
-      d.day === day ? { ...d, medication: ester } : d
-    );
+    // Update the first dose on this day (backward compatibility)
+    const dayDoses = doses.filter(d => d.day === day);
+    if (dayDoses.length === 0) return;
+
+    const newDoses = doses.map(d => {
+      if (d.day === day && d === dayDoses[0]) {
+        return { ...d, medication: ester };
+      }
+      return d;
+    });
     onDosesChange(newDoses);
   };
 
@@ -109,6 +126,7 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
     setSelectedDose(selectedDose === day ? null : day);
   };
 
+  // Get the first dose on the selected day for the DoseEditor (backward compatibility)
   const selectedDoseData = selectedDose !== null ? (doses.find(d => d.day === selectedDose) ?? null) : null;
 
   // Calculate dosage display text

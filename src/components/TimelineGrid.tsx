@@ -32,19 +32,11 @@ const TimelineGrid: React.FC<TimelineGridProps> = ({
   const [editingValue, setEditingValue] = useState<string>('');
 
   const renderTimelineDay = (day: number) => {
-    const doseData = doses.find(d => d.day === day);
-    const dose = doseData?.dose || null;
-    const hasInjection = dose !== null;
+    const dosesOnDay = doses.filter(d => d.day === day);
+    const hasInjections = dosesOnDay.length > 0;
     const isSelected = selectedDose === day;
-    const isEditing = editingDose === day;
 
-    if (hasInjection && doseData) {
-      const medication = doseData.medication || doseData.ester; // Backward compatibility
-      const medicationName = medication?.name || 'Unknown';
-      const backgroundColor = getEsterColor(medicationName);
-      const concentration = esterConcentrations[medicationName] || 40;
-      const volumeMl = dose / concentration;
-
+    if (hasInjections) {
       return (
         <div
           key={day}
@@ -53,86 +45,131 @@ const TimelineGrid: React.FC<TimelineGridProps> = ({
           style={{
             width: '100%',
             aspectRatio: '1',
-            backgroundColor,
+            backgroundColor: COLORS.white,
             border: isSelected ? `2px solid ${COLORS.primaryHover}` : `1px solid ${COLORS.gray300}`,
             borderRadius: BORDER_RADIUS.sm,
             cursor: 'pointer',
             display: 'flex',
+            flexDirection: 'column' as const,
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: TYPOGRAPHY.fontSize.base,
-            color: COLORS.white,
-            fontWeight: TYPOGRAPHY.fontWeight.semibold,
+            gap: '3px',
+            padding: '4px',
             position: 'relative' as const,
             transition: 'all 0.15s ease',
-            boxShadow: `0 1px 2px ${backgroundColor}66`,
             overflow: 'hidden'
           }}
-          title={`Day ${day}: ${formatNumber(dose)}mg = ${formatNumber(volumeMl, 3)}mL (${medicationName})`}
+          title={`Day ${day}: ${dosesOnDay.length} medication${dosesOnDay.length > 1 ? 's' : ''}`}
         >
-          <input
-            ref={(el) => { inputRefs.current[day] = el; }}
-            type="text"
-            value={isEditing ? editingValue : formatNumber(dose)}
-            onChange={(e) => {
-              setEditingValue(e.target.value);
-            }}
-            onFocus={(e) => {
-              setEditingDose(day);
-              setEditingValue(dose?.toString() || '');
-              e.target.select();
-            }}
-            onBlur={() => {
-              const newDose = parsePositiveFloat(editingValue, 0);
-              if (newDose !== null) {
-                onDoseUpdate(day, newDose);
-              }
-              setEditingDose(null);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                const newDose = parsePositiveFloat(editingValue, 0);
-                if (newDose !== null) {
-                  onDoseUpdate(day, newDose);
-                }
-                setEditingDose(null);
-                e.currentTarget.blur();
-              } else if (e.key === 'Escape') {
-                setEditingDose(null);
-                e.currentTarget.blur();
-              }
-            }}
-            readOnly={!isEditing}
-            style={{
-              width: '4ch',
-              minWidth: '4ch',
-              maxWidth: '4ch',
-              border: 'none',
-              background: 'transparent',
-              textAlign: 'center' as const,
-              fontSize: TYPOGRAPHY.fontSize.base,
-              fontWeight: TYPOGRAPHY.fontWeight.semibold,
-              color: COLORS.white,
-              padding: '0',
-              outline: 'none',
-              cursor: 'pointer'
-            }}
-          />
-          {/* Volume display in corner */}
-          <div
-            style={{
-              position: 'absolute' as const,
-              bottom: '2px',
-              right: '3px',
-              fontSize: TYPOGRAPHY.fontSize.xs,
-              fontWeight: TYPOGRAPHY.fontWeight.medium,
-              color: 'rgba(255, 255, 255, 0.85)',
-              pointerEvents: 'none' as const,
-              textShadow: '0 0 2px rgba(0,0,0,0.3)'
-            }}
-          >
-            {formatNumber(volumeMl, 3)}mL
-          </div>
+          {/* Day number in top-left corner */}
+          {day % 7 === 0 && (
+            <div
+              style={{
+                position: 'absolute' as const,
+                top: '2px',
+                left: '3px',
+                fontSize: TYPOGRAPHY.fontSize.xs,
+                fontWeight: TYPOGRAPHY.fontWeight.medium,
+                color: COLORS.gray500,
+                pointerEvents: 'none' as const
+              }}
+            >
+              {day}
+            </div>
+          )}
+
+          {/* Render each medication as a pill */}
+          {dosesOnDay.map((doseData, index) => {
+            const medication = doseData.medication || doseData.ester; // Backward compatibility
+            const medicationName = medication?.name || 'Unknown';
+            const backgroundColor = getEsterColor(medicationName);
+            const concentration = esterConcentrations[medicationName] || 40;
+            const volumeMl = doseData.dose / concentration;
+            const isEditing = editingDose === day;
+
+            return (
+              <div
+                key={index}
+                style={{
+                  backgroundColor,
+                  borderRadius: '12px',
+                  padding: '2px 6px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: TYPOGRAPHY.fontSize.xs,
+                  fontWeight: TYPOGRAPHY.fontWeight.semibold,
+                  color: COLORS.white,
+                  boxShadow: `0 1px 2px ${backgroundColor}66`,
+                  minHeight: '20px',
+                  width: '100%',
+                  maxWidth: '100%',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap' as const
+                }}
+                title={`${formatNumber(doseData.dose)}mg = ${formatNumber(volumeMl, 3)}mL (${medicationName})`}
+              >
+                <input
+                  ref={(el) => {
+                    if (index === 0) inputRefs.current[day] = el;
+                  }}
+                  type="text"
+                  value={isEditing && index === 0 ? editingValue : formatNumber(doseData.dose)}
+                  onChange={(e) => {
+                    if (index === 0) setEditingValue(e.target.value);
+                  }}
+                  onFocus={(e) => {
+                    if (index === 0) {
+                      setEditingDose(day);
+                      setEditingValue(doseData.dose?.toString() || '');
+                      e.target.select();
+                    }
+                  }}
+                  onBlur={() => {
+                    if (index === 0) {
+                      const newDose = parsePositiveFloat(editingValue, 0);
+                      if (newDose !== null) {
+                        onDoseUpdate(day, newDose);
+                      }
+                      setEditingDose(null);
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (index === 0) {
+                      if (e.key === 'Enter') {
+                        const newDose = parsePositiveFloat(editingValue, 0);
+                        if (newDose !== null) {
+                          onDoseUpdate(day, newDose);
+                        }
+                        setEditingDose(null);
+                        e.currentTarget.blur();
+                      } else if (e.key === 'Escape') {
+                        setEditingDose(null);
+                        e.currentTarget.blur();
+                      }
+                    }
+                  }}
+                  readOnly={!isEditing || index !== 0}
+                  style={{
+                    width: '3ch',
+                    minWidth: '3ch',
+                    maxWidth: '3ch',
+                    border: 'none',
+                    background: 'transparent',
+                    textAlign: 'center' as const,
+                    fontSize: TYPOGRAPHY.fontSize.xs,
+                    fontWeight: TYPOGRAPHY.fontWeight.semibold,
+                    color: COLORS.white,
+                    padding: '0',
+                    outline: 'none',
+                    cursor: 'pointer'
+                  }}
+                />
+                <span style={{ fontSize: TYPOGRAPHY.fontSize.xs, marginLeft: '1px' }}>mg</span>
+              </div>
+            );
+          })}
         </div>
       );
     }
