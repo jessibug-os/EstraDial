@@ -11,7 +11,7 @@ describe('DoseEditor', () => {
   const testDose = {
     day: 5,
     dose: 6,
-    ester: ESTRADIOL_ESTERS[1]! // Estradiol valerate
+    medication: ESTRADIOL_ESTERS[1]! // Estradiol valerate
   };
 
   beforeEach(() => {
@@ -78,7 +78,7 @@ describe('DoseEditor', () => {
         />
       );
 
-      const select = screen.getByDisplayValue(testDose.ester.name);
+      const select = screen.getByDisplayValue(testDose.medication.name);
       expect(select).toBeInTheDocument();
 
       // Check that all esters are available as options
@@ -98,7 +98,7 @@ describe('DoseEditor', () => {
         />
       );
 
-      const select = screen.getByDisplayValue(testDose.ester.name);
+      const select = screen.getByDisplayValue(testDose.medication.name);
       fireEvent.change(select, { target: { value: 'Estradiol cypionate' } });
 
       expect(mockOnUpdateDoseEster).toHaveBeenCalledTimes(1);
@@ -213,7 +213,7 @@ describe('DoseEditor', () => {
       const doseWithDecimal = {
         day: 3,
         dose: 4.5,
-        ester: ESTRADIOL_ESTERS[1]!
+        medication: ESTRADIOL_ESTERS[1]!
       };
 
       render(

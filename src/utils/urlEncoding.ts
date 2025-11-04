@@ -38,7 +38,8 @@ export interface ScheduleData {
 export function encodeSchedule(data: ScheduleData): string {
   // Encode doses: day,dose*100,esterIndex
   const doseParts = data.doses.map(d => {
-    const esterIndex = ESTRADIOL_ESTERS.findIndex(e => e.name === d.ester.name);
+    const medication = d.medication || d.ester; // Backward compatibility
+    const esterIndex = ESTRADIOL_ESTERS.findIndex(e => e.name === medication?.name);
     const doseInt = Math.round(d.dose * 100);
     return `${d.day},${doseInt},${esterIndex}`;
   });
@@ -88,10 +89,10 @@ export function decodeSchedule(encoded: string): ScheduleData | null {
         const day = parseInt(dayStr);
         const dose = parseInt(doseStr) / 100;
         const esterIndex = parseInt(esterStr);
-        const ester = ESTRADIOL_ESTERS[esterIndex] || ESTRADIOL_ESTERS[1]!;
+        const medication = ESTRADIOL_ESTERS[esterIndex] || ESTRADIOL_ESTERS[1]!;
 
-        if (!isNaN(day) && !isNaN(dose) && ester) {
-          doses.push({ day, dose, ester });
+        if (!isNaN(day) && !isNaN(dose) && medication) {
+          doses.push({ day, dose, medication });
         }
       }
     }
@@ -117,7 +118,7 @@ export function decodeLegacySchedule(encoded: string): ScheduleData | null {
     const doses = decoded[0].map((d: any) => ({
       day: d[0],
       dose: d[1],
-      ester: ESTRADIOL_ESTERS[d[2]] || ESTRADIOL_ESTERS[1]
+      medication: ESTRADIOL_ESTERS[d[2]] || ESTRADIOL_ESTERS[1]
     }));
 
     return {

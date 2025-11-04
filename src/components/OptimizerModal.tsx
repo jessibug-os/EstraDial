@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { ESTRADIOL_ESTERS, EstradiolEster } from '../data/estradiolEsters';
+import { ESTRADIOL_ESTERS } from '../data/estradiolEsters';
+import { EstradiolMedication } from '../types/medication';
 import { ReferenceCycleType } from '../data/referenceData';
 import { formatNumber } from '../utils/formatters';
 import ErrorBoundary from './ErrorBoundary';
@@ -12,10 +13,10 @@ interface OptimizerModalProps {
   viewDays: number;
   referenceCycleType: ReferenceCycleType;
   esterConcentrations: Record<string, number>;
-  selectedEsters: EstradiolEster[];
+  selectedEsters: EstradiolMedication[];
   maxInjections: number;
   granularity: number;
-  onSettingsChange: (selectedEsters: EstradiolEster[], granularity: number) => void;
+  onSettingsChange: (selectedEsters: EstradiolMedication[], granularity: number) => void;
 }
 
 const OptimizerModal: React.FC<OptimizerModalProps> = ({
@@ -25,7 +26,7 @@ const OptimizerModal: React.FC<OptimizerModalProps> = ({
   granularity: initialGranularity,
   onSettingsChange
 }) => {
-  const [selectedEsters, setSelectedEsters] = useState<EstradiolEster[]>(initialSelectedEsters);
+  const [selectedEsters, setSelectedEsters] = useState<EstradiolMedication[]>(initialSelectedEsters);
   const [granularity, setGranularity] = useState<number>(initialGranularity);
 
   // Update local state when props change

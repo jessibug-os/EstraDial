@@ -1,4 +1,5 @@
-import { EstradiolEster, Dose } from '../data/estradiolEsters';
+import { Dose } from '../data/estradiolEsters';
+import { EstradiolMedication } from '../types/medication';
 import { PHARMACOKINETICS } from '../constants/pharmacokinetics';
 
 export interface ConcentrationPoint {
@@ -10,7 +11,7 @@ export function calculateConcentration(
   t: number,
   day: number,
   dose: number,
-  ester: EstradiolEster
+  ester: EstradiolMedication
 ): number {
   if (t < day || t > day + PHARMACOKINETICS.ESTER_EFFECT_DURATION_DAYS) {
     return 0;
@@ -34,8 +35,11 @@ export function calculateTotalConcentration(
   timePoints: number[]
 ): ConcentrationPoint[] {
   return timePoints.map(t => {
-    const totalConcentration = doses.reduce((sum, { day, dose, ester }) => {
-      return sum + calculateConcentration(t, day, dose, ester);
+    const totalConcentration = doses.reduce((sum, { day, dose, medication, ester }) => {
+      // Use medication if available, fall back to legacy ester for backward compatibility
+      const med = medication || (ester ? { ...ester, type: 'estradiol' as const } : null);
+      if (!med) return sum;
+      return sum + calculateConcentration(t, day, dose, med as EstradiolMedication);
     }, 0);
 
     return {

@@ -1,10 +1,11 @@
-import { Dose, EstradiolEster } from '../data/estradiolEsters';
+import { Dose } from '../data/estradiolEsters';
+import { EstradiolMedication } from '../types/medication';
 import { calculateTotalConcentration, generateTimePoints } from './pharmacokinetics';
 import { generateReferenceCycle, ReferenceCycleType } from '../data/referenceData';
 import { PHARMACOKINETICS } from '../constants/pharmacokinetics';
 
 export interface OptimizationParams {
-  availableEsters: EstradiolEster[];
+  availableEsters: EstradiolMedication[];
   scheduleLength: number;
   referenceCycleType: ReferenceCycleType;
   steadyState?: boolean;
@@ -127,7 +128,7 @@ export async function optimizeSchedule(
   let currentDoses: Dose[] = candidateDays.map(day => ({
     day,
     dose: startingDose,
-    ester: primaryEster
+    medication: primaryEster
   }));
 
   let currentScore = calculateMSE(currentDoses, referenceData, scheduleLength, steadyState);
@@ -179,8 +180,8 @@ export async function optimizeSchedule(
     for (let i = 0; i < currentDoses.length; i++) {
       const dose = currentDoses[i]!;
       const originalDose = dose.dose;
-      const ester = dose.ester;
-      const concentration = esterConcentrations[ester.name] || 40;
+      const medication = dose.medication;
+      const concentration = esterConcentrations[medication.name] || 40;
 
       // Convert to mL for adjustment
       const originalVolumeMl = originalDose / concentration;
@@ -233,14 +234,14 @@ export async function optimizeSchedule(
     // Try different esters if multiple available
     if (availableEsters.length > 1) {
       for (let i = 0; i < currentDoses.length; i++) {
-        const originalEster = currentDoses[i]!.ester;
+        const originalEster = currentDoses[i]!.medication;
         let bestEster = originalEster;
         let bestEsterScore = currentScore;
 
         for (const ester of availableEsters) {
           if (ester.name === originalEster.name) continue;
 
-          currentDoses[i]!.ester = ester;
+          currentDoses[i]!.medication = ester;
           const newScore = calculateMSE(currentDoses, referenceData, scheduleLength, steadyState);
 
           if (newScore < bestEsterScore) {
@@ -251,7 +252,7 @@ export async function optimizeSchedule(
         }
 
         // Apply best ester found
-        currentDoses[i]!.ester = bestEster;
+        currentDoses[i]!.medication = bestEster;
         currentScore = bestEsterScore;
       }
     }

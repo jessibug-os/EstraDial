@@ -36,7 +36,7 @@ const DoseEditor: React.FC<DoseEditorProps> = ({
           <div style={{ marginBottom: SPACING['2xl'] }}>
             <label style={{ display: 'block', marginBottom: SPACING.md, fontWeight: TYPOGRAPHY.fontWeight.semibold, fontSize: TYPOGRAPHY.fontSize.md }}>Estradiol Ester:</label>
             <select
-              value={selectedDoseData.ester.name}
+              value={(selectedDoseData.medication || selectedDoseData.ester)?.name}
               onChange={(e) => onUpdateDoseEster(selectedDoseData.day, e.target.value)}
               style={{
                 width: '100%',
@@ -74,22 +74,33 @@ const DoseEditor: React.FC<DoseEditorProps> = ({
           <div style={{ marginBottom: SPACING['3xl'], padding: SPACING.xl, backgroundColor: COLORS.parameterBackground, borderRadius: BORDER_RADIUS.sm }}>
             <div style={{ fontSize: TYPOGRAPHY.fontSize.sm, fontWeight: TYPOGRAPHY.fontWeight.semibold, marginBottom: SPACING.md, color: COLORS.parameterText }}>Pharmacokinetic Parameters:</div>
             <div style={{ fontSize: TYPOGRAPHY.fontSize.sm, color: COLORS.gray600 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span>D:</span>
-                <span style={{ fontFamily: 'monospace' }}>{selectedDoseData.ester.D.toExponential(2)}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span>k1:</span>
-                <span style={{ fontFamily: 'monospace' }}>{selectedDoseData.ester.k1.toFixed(4)}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span>k2:</span>
-                <span style={{ fontFamily: 'monospace' }}>{selectedDoseData.ester.k2.toFixed(4)}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>k3:</span>
-                <span style={{ fontFamily: 'monospace' }}>{selectedDoseData.ester.k3.toFixed(4)}</span>
-              </div>
+              {(() => {
+                const med = selectedDoseData.medication || selectedDoseData.ester;
+                // Check if it's an estradiol medication (has D, k1, k2, k3)
+                if (med && 'D' in med) {
+                  return (
+                    <>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                        <span>D:</span>
+                        <span style={{ fontFamily: 'monospace' }}>{med.D.toExponential(2)}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                        <span>k1:</span>
+                        <span style={{ fontFamily: 'monospace' }}>{med.k1.toFixed(4)}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                        <span>k2:</span>
+                        <span style={{ fontFamily: 'monospace' }}>{med.k2.toFixed(4)}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span>k3:</span>
+                        <span style={{ fontFamily: 'monospace' }}>{med.k3.toFixed(4)}</span>
+                      </div>
+                    </>
+                  );
+                }
+                return null;
+              })()}
             </div>
           </div>
 

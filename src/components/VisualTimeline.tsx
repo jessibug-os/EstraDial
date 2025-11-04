@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Dose, ESTRADIOL_ESTERS, EstradiolEster } from '../data/estradiolEsters';
+import { Dose, ESTRADIOL_ESTERS } from '../data/estradiolEsters';
+import { EstradiolMedication } from '../types/medication';
 import { formatNumber } from '../utils/formatters';
 import { useDebouncedInput } from '../hooks/useDebounce';
 import { parsePositiveInteger } from '../utils/validation';
@@ -67,14 +68,14 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
   // Default to Estradiol valerate for new injections
   const DEFAULT_ESTER = ESTRADIOL_ESTERS[1] || ESTRADIOL_ESTERS[0]!;
 
-  const addOrUpdateDose = (day: number, dose: number = 6, ester: EstradiolEster = DEFAULT_ESTER) => {
+  const addOrUpdateDose = (day: number, dose: number = 6, ester: EstradiolMedication = DEFAULT_ESTER) => {
     const existingIndex = doses.findIndex(d => d.day === day);
     let newDoses = [...doses];
 
     if (existingIndex >= 0) {
-      newDoses[existingIndex] = { day, dose, ester };
+      newDoses[existingIndex] = { day, dose, medication: ester };
     } else {
-      newDoses.push({ day, dose, ester });
+      newDoses.push({ day, dose, medication: ester });
       newDoses.sort((a, b) => a.day - b.day);
     }
 
@@ -99,7 +100,7 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
     if (!ester) return;
 
     const newDoses = doses.map(d =>
-      d.day === day ? { ...d, ester } : d
+      d.day === day ? { ...d, medication: ester } : d
     );
     onDosesChange(newDoses);
   };

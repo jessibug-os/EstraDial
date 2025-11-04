@@ -141,7 +141,7 @@ describe('calculateTotalConcentration', () => {
 
   describe('single dose', () => {
     it('should handle single dose correctly', () => {
-      const doses = [{ day: 0, dose: 5, ester: EV }];
+      const doses = [{ day: 0, dose: 5, medication: EV }];
       const timePoints = [0, 1, 2, 3, 4, 5];
 
       const result = calculateTotalConcentration(doses, timePoints);
@@ -154,7 +154,7 @@ describe('calculateTotalConcentration', () => {
     });
 
     it('should match single calculateConcentration for single dose', () => {
-      const doses = [{ day: 0, dose: 5, ester: EV }];
+      const doses = [{ day: 0, dose: 5, medication: EV }];
       const timePoints = [0, 1, 2, 3, 4, 5];
 
       const result = calculateTotalConcentration(doses, timePoints);
@@ -169,8 +169,8 @@ describe('calculateTotalConcentration', () => {
   describe('multiple doses', () => {
     it('should sum concentrations from multiple doses', () => {
       const doses = [
-        { day: 0, dose: 5, ester: EV },
-        { day: 3, dose: 5, ester: EV },
+        { day: 0, dose: 5, medication: EV },
+        { day: 3, dose: 5, medication: EV },
       ];
       const timePoints = [4];
 
@@ -186,8 +186,8 @@ describe('calculateTotalConcentration', () => {
     it('should handle doses with different esters', () => {
       const EC = ESTRADIOL_ESTERS[2]!;
       const doses = [
-        { day: 0, dose: 5, ester: EV },
-        { day: 3, dose: 5, ester: EC },
+        { day: 0, dose: 5, medication: EV },
+        { day: 3, dose: 5, medication: EC },
       ];
       const timePoints = [4];
 
@@ -199,7 +199,7 @@ describe('calculateTotalConcentration', () => {
 
     it('should handle empty doses array', () => {
       const doses: typeof ESTRADIOL_ESTERS extends Array<infer T>
-        ? Array<{ day: number; dose: number; ester: T }>
+        ? Array<{ day: number; dose: number; medication: T }>
         : never = [];
       const timePoints = [0, 1, 2];
 
@@ -214,9 +214,9 @@ describe('calculateTotalConcentration', () => {
   describe('steady state simulation', () => {
     it('should show buildup from repeated doses', () => {
       const doses = [
-        { day: 0, dose: 5, ester: EV },
-        { day: 7, dose: 5, ester: EV },
-        { day: 14, dose: 5, ester: EV },
+        { day: 0, dose: 5, medication: EV },
+        { day: 7, dose: 5, medication: EV },
+        { day: 14, dose: 5, medication: EV },
       ];
       const timePoints = generateTimePoints(21, 1);
 
@@ -232,7 +232,7 @@ describe('calculateTotalConcentration', () => {
     it('should maintain non-negative concentrations with many doses', () => {
       const doses = [];
       for (let day = 0; day < 100; day += 7) {
-        doses.push({ day, dose: 5, ester: EV });
+        doses.push({ day, dose: 5, medication: EV });
       }
 
       const timePoints = generateTimePoints(100, 1);
@@ -247,7 +247,7 @@ describe('calculateTotalConcentration', () => {
 
   describe('edge cases', () => {
     it('should handle very large doses', () => {
-      const doses = [{ day: 0, dose: 100, ester: EV }];
+      const doses = [{ day: 0, dose: 100, medication: EV }];
       const timePoints = [1];
 
       const result = calculateTotalConcentration(doses, timePoints);
@@ -257,7 +257,7 @@ describe('calculateTotalConcentration', () => {
     });
 
     it('should handle very small doses', () => {
-      const doses = [{ day: 0, dose: 0.01, ester: EV }];
+      const doses = [{ day: 0, dose: 0.01, medication: EV }];
       const timePoints = [1];
 
       const result = calculateTotalConcentration(doses, timePoints);
@@ -268,8 +268,8 @@ describe('calculateTotalConcentration', () => {
 
     it('should handle doses far apart in time', () => {
       const doses = [
-        { day: 0, dose: 5, ester: EV },
-        { day: 1000, dose: 5, ester: EV },
+        { day: 0, dose: 5, medication: EV },
+        { day: 1000, dose: 5, medication: EV },
       ];
       const timePoints = [500, 1001];
 

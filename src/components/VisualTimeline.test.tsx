@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import VisualTimeline from './VisualTimeline';
-import { Dose } from '../data/estradiolEsters';
+import { Dose, ESTRADIOL_ESTERS } from '../data/estradiolEsters';
 
 describe('VisualTimeline', () => {
   const mockOnDosesChange = jest.fn();
@@ -41,9 +41,10 @@ describe('VisualTimeline', () => {
     });
 
     it('displays injection count correctly', () => {
+      const EV = ESTRADIOL_ESTERS[1]!; // Estradiol valerate
       const doses: Dose[] = [
-        { day: 0, dose: 5, ester: { name: 'Estradiol valerate', D: 1e-3, k1: 0.13, k2: 0.16, k3: 0.048 } },
-        { day: 7, dose: 5, ester: { name: 'Estradiol valerate', D: 1e-3, k1: 0.13, k2: 0.16, k3: 0.048 } }
+        { day: 0, dose: 5, medication: EV },
+        { day: 7, dose: 5, medication: EV }
       ];
       
       render(<VisualTimeline {...defaultProps} doses={doses} />);
@@ -53,7 +54,7 @@ describe('VisualTimeline', () => {
 
     it('shows singular "injection" for single dose', () => {
       const doses: Dose[] = [
-        { day: 0, dose: 5, ester: { name: 'Estradiol valerate', D: 1e-3, k1: 0.13, k2: 0.16, k3: 0.048 } }
+        { day: 0, dose: 5, medication: ESTRADIOL_ESTERS[1]! }
       ];
 
       render(<VisualTimeline {...defaultProps} doses={doses} />);
@@ -160,7 +161,7 @@ describe('VisualTimeline', () => {
       expect(resetButtons).toHaveLength(0);
 
       const doses: Dose[] = [
-        { day: 0, dose: 5, ester: { name: 'Estradiol valerate', D: 1e-3, k1: 0.13, k2: 0.16, k3: 0.048 } }
+        { day: 0, dose: 5, medication: ESTRADIOL_ESTERS[1]! }
       ];
       rerender(<VisualTimeline {...defaultProps} doses={doses} />);
 
@@ -173,8 +174,8 @@ describe('VisualTimeline', () => {
   describe('Dosage display', () => {
     it('shows total mg for non-repeated schedules', () => {
       const doses: Dose[] = [
-        { day: 0, dose: 5, ester: { name: 'Estradiol valerate', D: 1e-3, k1: 0.13, k2: 0.16, k3: 0.048 } },
-        { day: 7, dose: 3, ester: { name: 'Estradiol valerate', D: 1e-3, k1: 0.13, k2: 0.16, k3: 0.048 } }
+        { day: 0, dose: 5, medication: ESTRADIOL_ESTERS[1]! },
+        { day: 7, dose: 3, medication: ESTRADIOL_ESTERS[1]! }
       ];
       
       render(<VisualTimeline {...defaultProps} doses={doses} repeatSchedule={false} />);
@@ -184,8 +185,8 @@ describe('VisualTimeline', () => {
 
     it('shows average weekly dose for repeated schedules', () => {
       const doses: Dose[] = [
-        { day: 0, dose: 5, ester: { name: 'Estradiol valerate', D: 1e-3, k1: 0.13, k2: 0.16, k3: 0.048 } },
-        { day: 14, dose: 5, ester: { name: 'Estradiol valerate', D: 1e-3, k1: 0.13, k2: 0.16, k3: 0.048 } }
+        { day: 0, dose: 5, medication: ESTRADIOL_ESTERS[1]! },
+        { day: 14, dose: 5, medication: ESTRADIOL_ESTERS[1]! }
       ];
       
       render(<VisualTimeline {...defaultProps} doses={doses} viewDays={28} repeatSchedule={true} />);
@@ -207,8 +208,8 @@ describe('VisualTimeline', () => {
   describe('Auto-removal of out-of-range doses', () => {
     it('removes doses beyond schedule length when length is reduced', () => {
       const doses: Dose[] = [
-        { day: 0, dose: 5, ester: { name: 'Estradiol valerate', D: 1e-3, k1: 0.13, k2: 0.16, k3: 0.048 } },
-        { day: 20, dose: 5, ester: { name: 'Estradiol valerate', D: 1e-3, k1: 0.13, k2: 0.16, k3: 0.048 } }
+        { day: 0, dose: 5, medication: ESTRADIOL_ESTERS[1]! },
+        { day: 20, dose: 5, medication: ESTRADIOL_ESTERS[1]! }
       ];
       
       const { rerender } = render(<VisualTimeline {...defaultProps} doses={doses} viewDays={28} />);

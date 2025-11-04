@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
-import { Dose, EstradiolEster } from '../data/estradiolEsters';
+import { Dose } from '../data/estradiolEsters';
+import { EstradiolMedication } from '../types/medication';
 import { formatNumber } from '../utils/formatters';
 import { getEsterColor } from '../constants/colors';
 import { parsePositiveFloat } from '../utils/validation';
@@ -10,9 +11,9 @@ interface TimelineGridProps {
   viewDays: number;
   selectedDose: number | null;
   esterConcentrations: Record<string, number>;
-  defaultEster: EstradiolEster;
+  defaultEster: EstradiolMedication;
   onDoseClick: (day: number) => void;
-  onDoseAdd: (day: number, dose: number, ester: EstradiolEster) => void;
+  onDoseAdd: (day: number, dose: number, ester: EstradiolMedication) => void;
   onDoseUpdate: (day: number, newDose: number) => void;
 }
 
@@ -38,8 +39,10 @@ const TimelineGrid: React.FC<TimelineGridProps> = ({
     const isEditing = editingDose === day;
 
     if (hasInjection && doseData) {
-      const backgroundColor = getEsterColor(doseData.ester.name);
-      const concentration = esterConcentrations[doseData.ester.name] || 40;
+      const medication = doseData.medication || doseData.ester; // Backward compatibility
+      const medicationName = medication?.name || 'Unknown';
+      const backgroundColor = getEsterColor(medicationName);
+      const concentration = esterConcentrations[medicationName] || 40;
       const volumeMl = dose / concentration;
 
       return (
@@ -65,7 +68,7 @@ const TimelineGrid: React.FC<TimelineGridProps> = ({
             boxShadow: `0 1px 2px ${backgroundColor}66`,
             overflow: 'hidden'
           }}
-          title={`Day ${day}: ${formatNumber(dose)}mg = ${formatNumber(volumeMl, 3)}mL (${doseData.ester.name})`}
+          title={`Day ${day}: ${formatNumber(dose)}mg = ${formatNumber(volumeMl, 3)}mL (${medicationName})`}
         >
           <input
             ref={(el) => { inputRefs.current[day] = el; }}
