@@ -1,4 +1,5 @@
 import { Dose, ESTRADIOL_ESTERS } from '../data/estradiolEsters';
+import { PROGESTERONE_ROUTES } from '../data/progesteroneRoutes';
 import { formatNumber } from '../utils/formatters';
 import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS, BUTTON_STYLES, INPUT_STYLES, mergeStyles } from '../constants/styles';
 
@@ -34,7 +35,7 @@ const DoseEditor: React.FC<DoseEditorProps> = ({
           <h4 style={{ margin: `0 0 ${SPACING['2xl']} 0`, fontSize: TYPOGRAPHY.fontSize.lg, fontWeight: TYPOGRAPHY.fontWeight.semibold }}>Edit Injection - Day {selectedDoseData.day}</h4>
 
           <div style={{ marginBottom: SPACING['2xl'] }}>
-            <label style={{ display: 'block', marginBottom: SPACING.md, fontWeight: TYPOGRAPHY.fontWeight.semibold, fontSize: TYPOGRAPHY.fontSize.md }}>Estradiol Ester:</label>
+            <label style={{ display: 'block', marginBottom: SPACING.md, fontWeight: TYPOGRAPHY.fontWeight.semibold, fontSize: TYPOGRAPHY.fontSize.md }}>Medication:</label>
             <select
               value={(selectedDoseData.medication || selectedDoseData.ester)?.name}
               onChange={(e) => onUpdateDoseEster(selectedDoseData.day, e.target.value)}
@@ -47,11 +48,20 @@ const DoseEditor: React.FC<DoseEditorProps> = ({
                 backgroundColor: COLORS.white
               }}
             >
-              {ESTRADIOL_ESTERS.map((ester) => (
-                <option key={ester.name} value={ester.name}>
-                  {ester.name}
-                </option>
-              ))}
+              <optgroup label="Estradiol Esters">
+                {ESTRADIOL_ESTERS.map((ester) => (
+                  <option key={ester.name} value={ester.name}>
+                    {ester.name}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="Progesterone">
+                {PROGESTERONE_ROUTES.map((prog) => (
+                  <option key={prog.name} value={prog.name}>
+                    {prog.name}
+                  </option>
+                ))}
+              </optgroup>
             </select>
           </div>
 

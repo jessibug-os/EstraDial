@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Dose, ESTRADIOL_ESTERS } from '../data/estradiolEsters';
+import { PROGESTERONE_ROUTES } from '../data/progesteroneRoutes';
 import { EstradiolMedication } from '../types/medication';
 import { formatNumber } from '../utils/formatters';
 import { useDebouncedInput } from '../hooks/useDebounce';
@@ -105,9 +106,11 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
     onDosesChange(newDoses);
   };
 
-  const updateDoseEster = (day: number, esterName: string) => {
-    const ester = ESTRADIOL_ESTERS.find(e => e.name === esterName);
-    if (!ester) return;
+  const updateDoseEster = (day: number, medicationName: string) => {
+    // Find medication in either estradiol esters or progesterone routes
+    const allMedications = [...ESTRADIOL_ESTERS, ...PROGESTERONE_ROUTES];
+    const medication = allMedications.find(m => m.name === medicationName);
+    if (!medication) return;
 
     // Update the first dose on this day (backward compatibility)
     const dayDoses = doses.filter(d => d.day === day);
@@ -115,7 +118,7 @@ const VisualTimeline: React.FC<VisualTimelineProps> = ({
 
     const newDoses = doses.map(d => {
       if (d.day === day && d === dayDoses[0]) {
-        return { ...d, medication: ester };
+        return { ...d, medication };
       }
       return d;
     });
