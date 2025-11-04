@@ -65,7 +65,7 @@ function calculateMSE(
       const genPoint = generated.find(g => Math.abs(g.time - time) < 0.1);
       if (!genPoint) continue;
 
-      const error = genPoint.concentration - refPoint.estradiol;
+      const error = genPoint.estradiolConcentration - refPoint.estradiol;
       sumSquaredError += error * error;
       count++;
     }

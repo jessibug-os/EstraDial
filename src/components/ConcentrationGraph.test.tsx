@@ -19,12 +19,12 @@ describe('ConcentrationGraph', () => {
   };
 
   const sampleData: ConcentrationPoint[] = [
-    { time: 0, concentration: 100 },
-    { time: 1, concentration: 150 },
-    { time: 2, concentration: 120 },
-    { time: 3, concentration: 90 },
-    { time: 4, concentration: 80 },
-    { time: 5, concentration: 70 },
+    { time: 0, estradiolConcentration: 100, progesteroneConcentration: 0, concentration: 100 },
+    { time: 1, estradiolConcentration: 150, progesteroneConcentration: 0, concentration: 150 },
+    { time: 2, estradiolConcentration: 120, progesteroneConcentration: 0, concentration: 120 },
+    { time: 3, estradiolConcentration: 90, progesteroneConcentration: 0, concentration: 90 },
+    { time: 4, estradiolConcentration: 80, progesteroneConcentration: 0, concentration: 80 },
+    { time: 5, estradiolConcentration: 70, progesteroneConcentration: 0, concentration: 70 },
   ];
 
   const defaultProps = {
@@ -268,10 +268,10 @@ describe('ConcentrationGraph', () => {
 
     it('should filter data to viewDays', () => {
       const largeData: ConcentrationPoint[] = [
-        { time: 0, concentration: 100 },
-        { time: 5, concentration: 150 },
-        { time: 10, concentration: 120 },
-        { time: 15, concentration: 90 },
+        { time: 0, estradiolConcentration: 100, progesteroneConcentration: 0, concentration: 100 },
+        { time: 5, estradiolConcentration: 150, progesteroneConcentration: 0, concentration: 150 },
+        { time: 10, estradiolConcentration: 120, progesteroneConcentration: 0, concentration: 120 },
+        { time: 15, estradiolConcentration: 90, progesteroneConcentration: 0, concentration: 90 },
       ];
 
       const { rerender } = render(
@@ -306,7 +306,7 @@ describe('ConcentrationGraph', () => {
     });
 
     it('should handle single data point', () => {
-      const singlePoint: ConcentrationPoint[] = [{ time: 0, concentration: 100 }];
+      const singlePoint: ConcentrationPoint[] = [{ time: 0, estradiolConcentration: 100, progesteroneConcentration: 0, concentration: 100 }];
 
       render(
         <ConcentrationGraph
@@ -324,8 +324,8 @@ describe('ConcentrationGraph', () => {
 
     it('should handle very large concentrations', () => {
       const largeConcentrations: ConcentrationPoint[] = [
-        { time: 0, concentration: 5000 },
-        { time: 1, concentration: 10000 },
+        { time: 0, estradiolConcentration: 5000, progesteroneConcentration: 0, concentration: 5000 },
+        { time: 1, estradiolConcentration: 10000, progesteroneConcentration: 0, concentration: 10000 },
       ];
 
       render(

@@ -102,7 +102,7 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({
 
     return {
       time: point.time,
-      concentration: point.concentration,
+      concentration: point.estradiolConcentration,
       reference: referencePoint?.estradiol || null
     };
   });
@@ -129,7 +129,7 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({
   // Generate Y-axis ticks based on max value in data
   const generateYTicks = () => {
     const maxConcentration = Math.max(
-      ...filteredData.map(d => d.concentration),
+      ...filteredData.map(d => d.estradiolConcentration),
       ...combinedData.map(d => d.reference || 0)
     );
 
