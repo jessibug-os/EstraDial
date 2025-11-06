@@ -12,6 +12,7 @@ import { ConcentrationPoint } from '../utils/pharmacokinetics';
 import { generateReferenceCycle, ReferenceCycleType, REFERENCE_CYCLES } from '../data/referenceData';
 import { useDebouncedInput } from '../hooks/useDebounce';
 import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, INPUT_STYLES, mergeStyles } from '../constants/styles';
+import { AnyMedication } from '../types/medication';
 
 interface ConcentrationGraphProps {
   data: ConcentrationPoint[];
@@ -22,16 +23,18 @@ interface ConcentrationGraphProps {
   optimizeMode: boolean;
   onOptimizeModeChange: (mode: boolean) => void;
   optimizerSettings: {
-    selectedEsters: any[];
+    selectedEsters: AnyMedication[];
     maxInjections: number;
     granularity: number;
   };
   onOptimizerSettingsChange: (settings: any) => void;
   onOpenOptimizerSettings: () => void;
   isOptimizing: boolean;
+  optimizeProgress: number; // 0-100 percentage
   isFindingBestFit: boolean;
-  bestFitProgress: { current: number; total: number };
+  bestFitProgress: { current: number; total: number; injectionCount: number };
   onBestFit: () => void;
+  onStopBestFit: () => void;
 }
 
 const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({
@@ -46,9 +49,11 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({
   onOptimizerSettingsChange,
   onOpenOptimizerSettings,
   isOptimizing,
+  optimizeProgress,
   isFindingBestFit,
   bestFitProgress,
-  onBestFit
+  onBestFit,
+  onStopBestFit
 }) => {
   const [graphInputValue, setGraphInputValue] = useDebouncedInput(
     viewDays.toString(),
@@ -302,29 +307,29 @@ const ConcentrationGraph: React.FC<ConcentrationGraphProps> = ({
             <div style={{ fontSize: TYPOGRAPHY.fontSize.sm, color: COLORS.gray600 }}>
               {isFindingBestFit ? (
                 <span style={{ color: COLORS.primary, fontStyle: 'italic' }}>
-                  Finding best fit... {bestFitProgress.current}/{bestFitProgress.total}
+                  Finding best fit... {bestFitProgress.total > 0 ? Math.round((bestFitProgress.current / bestFitProgress.total) * 100) : 0}% (testing {bestFitProgress.injectionCount} injection{bestFitProgress.injectionCount !== 1 ? 's' : ''})
                 </span>
               ) : isOptimizing ? (
-                <span style={{ color: COLORS.primary, fontStyle: 'italic' }}>Optimizing...</span>
+                <span style={{ color: COLORS.primary, fontStyle: 'italic' }}>Optimizing... {Math.round(optimizeProgress)}%</span>
               ) : (
                 <>Esters: {optimizerSettings.selectedEsters.map(e => e.name).join(', ')} • Granularity: {optimizerSettings.granularity} mL</>
               )}
             </div>
             <div style={{ display: 'flex', gap: SPACING.md }}>
               <button
-                onClick={onBestFit}
-                disabled={isOptimizing}
+                onClick={isFindingBestFit ? onStopBestFit : onBestFit}
+                disabled={isOptimizing && !isFindingBestFit}
                 style={{
                   padding: `${SPACING.sm} ${SPACING.lg}`,
-                  backgroundColor: isOptimizing ? COLORS.gray300 : COLORS.primary,
+                  backgroundColor: isFindingBestFit ? '#dc2626' : (isOptimizing ? COLORS.gray300 : COLORS.primary),
                   color: COLORS.white,
                   border: 'none',
                   borderRadius: BORDER_RADIUS.sm,
-                  cursor: isOptimizing ? 'wait' : 'pointer',
+                  cursor: (isOptimizing && !isFindingBestFit) ? 'not-allowed' : 'pointer',
                   fontSize: TYPOGRAPHY.fontSize.base
                 }}
               >
-                Best Fit
+                {isFindingBestFit ? 'Stop' : 'Best Fit'}
               </button>
               <button
                 onClick={onOpenOptimizerSettings}

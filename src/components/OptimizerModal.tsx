@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ESTRADIOL_ESTERS } from '../data/estradiolEsters';
-import { EstradiolMedication } from '../types/medication';
+import { PROGESTERONE_ROUTES } from '../data/progesteroneRoutes';
+import { AnyMedication } from '../types/medication';
 import { ReferenceCycleType } from '../data/referenceData';
 import { formatNumber } from '../utils/formatters';
 import ErrorBoundary from './ErrorBoundary';
@@ -13,10 +14,11 @@ interface OptimizerModalProps {
   viewDays: number;
   referenceCycleType: ReferenceCycleType;
   esterConcentrations: Record<string, number>;
-  selectedEsters: EstradiolMedication[];
+  selectedEsters: AnyMedication[];
   maxInjections: number;
   granularity: number;
-  onSettingsChange: (selectedEsters: EstradiolMedication[], granularity: number) => void;
+  progesteroneDoses: number[];
+  onSettingsChange: (selectedEsters: AnyMedication[], granularity: number, progesteroneDoses: number[]) => void;
 }
 
 const OptimizerModal: React.FC<OptimizerModalProps> = ({
@@ -24,16 +26,19 @@ const OptimizerModal: React.FC<OptimizerModalProps> = ({
   onClose,
   selectedEsters: initialSelectedEsters,
   granularity: initialGranularity,
+  progesteroneDoses: initialProgesteroneDoses,
   onSettingsChange
 }) => {
-  const [selectedEsters, setSelectedEsters] = useState<EstradiolMedication[]>(initialSelectedEsters);
+  const [selectedEsters, setSelectedEsters] = useState<AnyMedication[]>(initialSelectedEsters);
   const [granularity, setGranularity] = useState<number>(initialGranularity);
+  const [progesteroneDoses, setProgesteroneDoses] = useState<number[]>(initialProgesteroneDoses);
 
   // Update local state when props change
   useEffect(() => {
     setSelectedEsters(initialSelectedEsters);
     setGranularity(initialGranularity);
-  }, [initialSelectedEsters, initialGranularity, isOpen]);
+    setProgesteroneDoses(initialProgesteroneDoses);
+  }, [initialSelectedEsters, initialGranularity, initialProgesteroneDoses, isOpen]);
 
   if (!isOpen) return null;
 
@@ -84,43 +89,150 @@ const OptimizerModal: React.FC<OptimizerModalProps> = ({
 
         <div style={{ marginBottom: SPACING['3xl'] }}>
           <label style={{ fontSize: TYPOGRAPHY.fontSize.md, fontWeight: TYPOGRAPHY.fontWeight.semibold, display: 'block', marginBottom: SPACING.lg }}>
-            Available Esters:
+            Available Medications:
           </label>
-          {ESTRADIOL_ESTERS.map((ester, index) => (
+
+          {/* Estradiol section */}
+          <div style={{ marginBottom: SPACING.lg }}>
+            <div style={{ fontSize: TYPOGRAPHY.fontSize.sm, fontWeight: TYPOGRAPHY.fontWeight.semibold, color: COLORS.gray600, marginBottom: SPACING.sm }}>
+              Estradiol Esters
+            </div>
+            {ESTRADIOL_ESTERS.map((ester, index) => (
+              <label
+                key={`estradiol-${index}`}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: SPACING.md,
+                  marginBottom: SPACING.sm,
+                  borderRadius: BORDER_RADIUS.sm,
+                  backgroundColor: selectedEsters.some(e => e.name === ester.name) ? '#f0e6ff' : COLORS.gray50,
+                  cursor: 'pointer',
+                  transition: 'background-color 0.15s'
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedEsters.some(e => e.name === ester.name)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedEsters([...selectedEsters, ester]);
+                    } else {
+                      setSelectedEsters(selectedEsters.filter(e => e.name !== ester.name));
+                    }
+                  }}
+                  style={{ marginRight: SPACING.lg, cursor: 'pointer' }}
+                />
+                <span style={{ fontSize: TYPOGRAPHY.fontSize.base }}>{ester.name}</span>
+              </label>
+            ))}
+          </div>
+
+          {/* Progesterone section */}
+          <div>
+            <div style={{ fontSize: TYPOGRAPHY.fontSize.sm, fontWeight: TYPOGRAPHY.fontWeight.semibold, color: COLORS.gray600, marginBottom: SPACING.sm }}>
+              Progesterone
+            </div>
+            {PROGESTERONE_ROUTES.map((prog, index) => (
+              <label
+                key={`progesterone-${index}`}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: SPACING.md,
+                  marginBottom: SPACING.sm,
+                  borderRadius: BORDER_RADIUS.sm,
+                  backgroundColor: selectedEsters.some(e => e.name === prog.name) ? '#f0e6ff' : COLORS.gray50,
+                  cursor: 'pointer',
+                  transition: 'background-color 0.15s'
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedEsters.some(e => e.name === prog.name)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedEsters([...selectedEsters, prog]);
+                    } else {
+                      setSelectedEsters(selectedEsters.filter(e => e.name !== prog.name));
+                    }
+                  }}
+                  style={{ marginRight: SPACING.lg, cursor: 'pointer' }}
+                />
+                <span style={{ fontSize: TYPOGRAPHY.fontSize.base }}>{prog.name}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Progesterone dose selection */}
+        <div style={{ marginBottom: SPACING['3xl'] }}>
+          <label style={{ fontSize: TYPOGRAPHY.fontSize.md, fontWeight: TYPOGRAPHY.fontWeight.semibold, display: 'block', marginBottom: SPACING.lg }}>
+            Available Progesterone Doses:
+          </label>
+          <div style={{ display: 'flex', gap: SPACING.lg }}>
             <label
-              key={index}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 padding: SPACING.md,
-                marginBottom: SPACING.sm,
                 borderRadius: BORDER_RADIUS.sm,
-                backgroundColor: selectedEsters.includes(ester) ? '#f0e6ff' : COLORS.gray50,
+                backgroundColor: progesteroneDoses.includes(100) ? '#f0e6ff' : COLORS.gray50,
                 cursor: 'pointer',
-                transition: 'background-color 0.15s'
+                transition: 'background-color 0.15s',
+                flex: 1
               }}
             >
               <input
                 type="checkbox"
-                checked={selectedEsters.includes(ester)}
+                checked={progesteroneDoses.includes(100)}
                 onChange={(e) => {
                   if (e.target.checked) {
-                    setSelectedEsters([...selectedEsters, ester]);
+                    setProgesteroneDoses([...progesteroneDoses, 100].sort());
                   } else {
-                    setSelectedEsters(selectedEsters.filter(e => e.name !== ester.name));
+                    setProgesteroneDoses(progesteroneDoses.filter(d => d !== 100));
                   }
                 }}
                 style={{ marginRight: SPACING.lg, cursor: 'pointer' }}
               />
-              <span style={{ fontSize: TYPOGRAPHY.fontSize.base }}>{ester.name}</span>
+              <span style={{ fontSize: TYPOGRAPHY.fontSize.base }}>100mg</span>
             </label>
-          ))}
+            <label
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: SPACING.md,
+                borderRadius: BORDER_RADIUS.sm,
+                backgroundColor: progesteroneDoses.includes(200) ? '#f0e6ff' : COLORS.gray50,
+                cursor: 'pointer',
+                transition: 'background-color 0.15s',
+                flex: 1
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={progesteroneDoses.includes(200)}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setProgesteroneDoses([...progesteroneDoses, 200].sort());
+                  } else {
+                    setProgesteroneDoses(progesteroneDoses.filter(d => d !== 200));
+                  }
+                }}
+                style={{ marginRight: SPACING.lg, cursor: 'pointer' }}
+              />
+              <span style={{ fontSize: TYPOGRAPHY.fontSize.base }}>200mg</span>
+            </label>
+          </div>
+          <div style={{ fontSize: TYPOGRAPHY.fontSize.sm, color: COLORS.gray600, marginTop: SPACING.sm }}>
+            Select which progesterone pill/suppository doses you have available
+          </div>
         </div>
 
         {selectedEsters.length === 0 && (
           <div style={{ padding: SPACING.lg, backgroundColor: COLORS.warning, borderRadius: BORDER_RADIUS.sm, marginBottom: SPACING['2xl'] }}>
             <span style={{ fontSize: TYPOGRAPHY.fontSize.base, color: COLORS.warningText }}>
-              Please select at least one ester
+              Please select at least one medication
             </span>
           </div>
         )}
@@ -173,7 +285,7 @@ const OptimizerModal: React.FC<OptimizerModalProps> = ({
           <button
             onClick={() => {
               if (selectedEsters.length === 0) return;
-              onSettingsChange(selectedEsters, granularity);
+              onSettingsChange(selectedEsters, granularity, progesteroneDoses.length > 0 ? progesteroneDoses : [100, 200]);
               onClose();
             }}
             disabled={selectedEsters.length === 0}

@@ -11,11 +11,13 @@ describe('ConcentrationGraph', () => {
   const mockOnOptimizerSettingsChange = jest.fn();
   const mockOnOpenOptimizerSettings = jest.fn();
   const mockOnBestFit = jest.fn();
+  const mockOnStopBestFit = jest.fn();
 
   const defaultOptimizerSettings = {
-    selectedEsters: [ESTRADIOL_ESTERS[0]],
+    selectedEsters: [ESTRADIOL_ESTERS[0]!],
     maxInjections: 4,
-    granularity: 0.05
+    granularity: 0.05,
+    progesteroneDoses: [100, 200]
   };
 
   const sampleData: ConcentrationPoint[] = [
@@ -34,9 +36,11 @@ describe('ConcentrationGraph', () => {
     onOptimizerSettingsChange: mockOnOptimizerSettingsChange,
     onOpenOptimizerSettings: mockOnOpenOptimizerSettings,
     isOptimizing: false,
+    optimizeProgress: 0,
     isFindingBestFit: false,
-    bestFitProgress: { current: 0, total: 0 },
-    onBestFit: mockOnBestFit
+    bestFitProgress: { current: 0, total: 0, injectionCount: 0 },
+    onBestFit: mockOnBestFit,
+    onStopBestFit: mockOnStopBestFit
   };
 
   beforeEach(() => {

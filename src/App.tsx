@@ -15,6 +15,7 @@ import VisualTimeline from './components/VisualTimeline';
 import ConcentrationGraph from './components/ConcentrationGraph';
 import OptimizerModal from './components/OptimizerModal';
 import { optimizeSchedule } from './utils/scheduleOptimizer';
+import { AnyMedication } from './types/medication';
 
 function App() {
   // Load from URL or use defaults
@@ -69,12 +70,19 @@ function App() {
   const [optimizeMode, setOptimizeMode] = useState(false);
   const [showOptimizerSettingsModal, setShowOptimizerSettingsModal] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
+  const [optimizeProgress, setOptimizeProgress] = useState(0); // 0-100 percentage
   const [isFindingBestFit, setIsFindingBestFit] = useState(false);
-  const [bestFitProgress, setBestFitProgress] = useState({ current: 0, total: 0 });
-  const [optimizerSettings, setOptimizerSettings] = useState({
+  const [bestFitProgress, setBestFitProgress] = useState({ current: 0, total: 0, injectionCount: 0 });
+  const [optimizerSettings, setOptimizerSettings] = useState<{
+    selectedEsters: AnyMedication[];
+    maxInjections: number;
+    granularity: number;
+    progesteroneDoses: number[]; // Available progesterone doses (100mg and/or 200mg)
+  }>({
     selectedEsters: [ESTRADIOL_ESTERS[1] || ESTRADIOL_ESTERS[0]!],
     maxInjections: 4,
-    granularity: 0.05
+    granularity: 0.05,
+    progesteroneDoses: [100, 200] // Default: both doses available
   });
 
   // Update URL when schedule changes
@@ -129,6 +137,7 @@ function App() {
   // Handle optimization
   const handleRunOptimization = async () => {
     setIsOptimizing(true);
+    setOptimizeProgress(0);
     try {
       const result = await optimizeSchedule(
         {
@@ -140,7 +149,12 @@ function App() {
           maxDosePerInjection: 10,
           minDosePerInjection: 0.1,
           maxInjectionsPerCycle: optimizerSettings.maxInjections,
-          esterConcentrations
+          esterConcentrations,
+          progesteroneDoses: optimizerSettings.progesteroneDoses
+        },
+        // Progress callback
+        (progress) => {
+          setOptimizeProgress(progress);
         }
       );
 
@@ -152,11 +166,21 @@ function App() {
       alert('Optimization failed. Please try again.');
     } finally {
       setIsOptimizing(false);
+      setOptimizeProgress(0);
     }
+  };
+
+  // Cancellation ref for best fit
+  const bestFitCancelRef = useRef(false);
+
+  // Stop best fit operation
+  const handleStopBestFit = () => {
+    bestFitCancelRef.current = true;
   };
 
   // Find best fit by testing all injection counts
   const handleBestFit = async () => {
+    bestFitCancelRef.current = false; // Reset cancellation flag
     setIsFindingBestFit(true);
     setIsOptimizing(true);
 
@@ -165,10 +189,23 @@ function App() {
       let bestInjectionCount = optimizerSettings.maxInjections;
       let bestDoses: Dose[] = [];
 
-      setBestFitProgress({ current: 0, total: scheduleLength });
+      // Calculate total work units: sum from 1 to scheduleLength
+      // Work is roughly proportional to number of injections being tested
+      // Total work = 1 + 2 + 3 + ... + n = n(n+1)/2
+      const totalWorkUnits = (scheduleLength * (scheduleLength + 1)) / 2;
+      let completedWorkUnits = 0;
+
+      setBestFitProgress({ current: 0, total: totalWorkUnits, injectionCount: 0 });
 
       for (let injections = 1; injections <= scheduleLength; injections++) {
-        setBestFitProgress({ current: injections, total: scheduleLength });
+        // Check for cancellation
+        if (bestFitCancelRef.current) {
+          console.log('Best fit cancelled by user');
+          break;
+        }
+        // Work units for this injection count (previous + current)
+        const workUnitsBeforeThis = completedWorkUnits;
+        const workUnitsForThis = injections;
 
         const result = await optimizeSchedule(
           {
@@ -180,9 +217,20 @@ function App() {
             maxDosePerInjection: 10,
             minDosePerInjection: 0.1,
             maxInjectionsPerCycle: injections,
-            esterConcentrations
+            esterConcentrations,
+            progesteroneDoses: optimizerSettings.progesteroneDoses
+          },
+          // Progress callback: interpolate between work units for this injection count
+          (progress) => {
+            // progress is 0-100 for this individual optimization
+            const currentWorkInProgress = workUnitsBeforeThis + (workUnitsForThis * progress / 100);
+            setBestFitProgress({ current: currentWorkInProgress, total: totalWorkUnits, injectionCount: injections });
           }
         );
+
+        // Update progress based on completed work units
+        completedWorkUnits += injections;
+        setBestFitProgress({ current: completedWorkUnits, total: totalWorkUnits, injectionCount: injections });
 
         if (result.score < bestScore) {
           bestScore = result.score;
@@ -205,7 +253,7 @@ function App() {
     } finally {
       setIsFindingBestFit(false);
       setIsOptimizing(false);
-      setBestFitProgress({ current: 0, total: 0 });
+      setBestFitProgress({ current: 0, total: 0, injectionCount: 0 });
     }
   };
 
@@ -319,9 +367,11 @@ function App() {
         onOptimizerSettingsChange={setOptimizerSettings}
         onOpenOptimizerSettings={() => setShowOptimizerSettingsModal(true)}
         isOptimizing={isOptimizing}
+        optimizeProgress={optimizeProgress}
         isFindingBestFit={isFindingBestFit}
         bestFitProgress={bestFitProgress}
         onBestFit={handleBestFit}
+        onStopBestFit={handleStopBestFit}
       />
 
       <OptimizerModal
@@ -333,11 +383,13 @@ function App() {
         selectedEsters={optimizerSettings.selectedEsters}
         maxInjections={optimizerSettings.maxInjections}
         granularity={optimizerSettings.granularity}
-        onSettingsChange={(selectedEsters, granularity) => {
+        progesteroneDoses={optimizerSettings.progesteroneDoses}
+        onSettingsChange={(selectedEsters, granularity, progesteroneDoses) => {
           setOptimizerSettings({
             ...optimizerSettings,
             selectedEsters,
-            granularity
+            granularity,
+            progesteroneDoses
           });
         }}
       />

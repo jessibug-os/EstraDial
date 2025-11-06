@@ -11,39 +11,44 @@ export const PROGESTERONE_ROUTES: ProgesteroneMedication[] = [
     name: 'Progesterone (oral)',
     route: 'oral',
     // Oral progesterone has poor bioavailability due to first-pass metabolism
-    // Peak levels: ~2-3 ng/mL with 100mg dose
-    // Time to peak: 2-4 hours
+    // Source: transfemscience.org/articles/oral-p4-low-levels/
+    // Peak levels: ~2 ng/mL with 100mg dose (LC-MS studies)
+    // Time to peak: 1-2 hours
     // Half-life: 5-10 hours
-    bioavailability: 0.02,    // ~2% (very low due to hepatic first-pass)
-    absorptionRate: 0.35,     // ka: Tmax ~3h
+    // Duration of elevated levels: 4-8 hours
+    bioavailability: 0.10,    // ~10% apparent (though true may be ~1-2%, accounts for active metabolites)
+    absorptionRate: 0.75,     // ka: Tmax ~1.5h (rapid absorption)
     eliminationRate: 0.10,    // ke: T½ ~7h
-    volumeOfDistribution: 50, // Vd in liters (estimated)
+    volumeOfDistribution: 3,  // Vd adjusted to match observed Cmax ~2 ng/mL
   },
   {
     type: MedicationType.PROGESTERONE,
     name: 'Progesterone (rectal)',
     route: 'rectal',
     // Rectal progesterone has good absorption, achieves luteal phase levels
-    // Peak levels: ~20 ng/mL with 200mg dose, ~22.5 ng/mL with 100mg
-    // Time to peak: 6-8 hours
-    // Half-life: ~16 hours
-    bioavailability: 0.30,    // ~30% (bypasses some hepatic first-pass)
-    absorptionRate: 0.15,     // ka: Tmax ~7h
-    eliminationRate: 0.043,   // ke: T½ ~16h
-    volumeOfDistribution: 50, // Vd in liters
+    // Source: transfemscience.org/articles/oral-p4-low-levels/
+    // Limited formal studies, but reported to achieve luteal phase levels (10-20 ng/mL)
+    // Estimated peak: ~15 ng/mL with 100mg, ~25-30 ng/mL with 200mg
+    // Time to peak: 4-8 hours (slower absorption than oral)
+    // Half-life: Similar to oral (~7-10h) as same hormone, but sustained levels
+    bioavailability: 0.30,    // ~30% (bypasses hepatic first-pass)
+    absorptionRate: 0.18,     // ka: Tmax ~6h (slower sustained absorption)
+    eliminationRate: 0.08,    // ke: T½ ~9h
+    volumeOfDistribution: 2,  // Vd adjusted to match estimated luteal phase levels (~15 ng/mL)
   },
   {
     type: MedicationType.PROGESTERONE,
     name: 'Progesterone (vaginal)',
     route: 'vaginal',
-    // Vaginal progesterone has uterine first-pass effect
-    // Peak levels: 10-15 ng/mL with 200mg dose
+    // Vaginal progesterone has uterine first-pass effect (less relevant for transfem people)
+    // Peak levels: Similar to rectal, achieves adequate systemic levels
+    // Estimated: ~12 ng/mL with 100mg, ~20-25 ng/mL with 200mg
     // Time to peak: 4-6 hours
-    // Half-life: ~16 hours
-    bioavailability: 0.25,    // ~25% (uterine first-pass effect)
+    // Half-life: ~7-10 hours
+    bioavailability: 0.28,    // ~28% (bypasses hepatic first-pass, slightly lower than rectal)
     absorptionRate: 0.20,     // ka: Tmax ~5h
-    eliminationRate: 0.043,   // ke: T½ ~16h
-    volumeOfDistribution: 50, // Vd in liters
+    eliminationRate: 0.08,    // ke: T½ ~9h
+    volumeOfDistribution: 2,  // Vd adjusted to match expected systemic levels (~12 ng/mL)
   },
 ];
 

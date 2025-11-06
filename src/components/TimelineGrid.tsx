@@ -1,3 +1,4 @@
+import React from 'react';
 import { Dose } from '../data/estradiolEsters';
 import { EstradiolMedication } from '../types/medication';
 import { formatNumber } from '../utils/formatters';
@@ -30,16 +31,21 @@ const TimelineGrid: React.FC<TimelineGridProps> = ({
   onAddAnotherDose
 }) => {
 
+  const [hoveredDay, setHoveredDay] = React.useState<number | null>(null);
+
   const renderTimelineDay = (day: number) => {
     const dosesOnDay = doses.filter(d => d.day === day);
     const hasInjections = dosesOnDay.length > 0;
     const isSelected = selectedDose === day;
+    const isHovered = hoveredDay === day;
 
     if (hasInjections) {
       return (
         <div
           key={day}
           onClick={() => onDoseClick(day)}
+          onMouseEnter={() => setHoveredDay(day)}
+          onMouseLeave={() => setHoveredDay(null)}
           className="testcell"
           style={{
             width: '100%',
@@ -80,7 +86,7 @@ const TimelineGrid: React.FC<TimelineGridProps> = ({
             </div>
           )}
 
-          {/* Plus button in top-right corner */}
+          {/* Plus button in top-right corner - only visible on hover */}
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -103,7 +109,9 @@ const TimelineGrid: React.FC<TimelineGridProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               padding: 0,
-              transition: 'all 0.15s ease'
+              transition: 'all 0.15s ease',
+              opacity: isHovered ? 1 : 0,
+              pointerEvents: isHovered ? 'auto' as const : 'none' as const
             }}
             onMouseOver={(e) => {
               e.currentTarget.style.backgroundColor = COLORS.primary;

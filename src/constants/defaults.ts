@@ -1,10 +1,15 @@
 /**
- * Default values for estradiol ester concentrations (mg/mL)
+ * Default values for medication concentrations/doses
+ *
+ * For injectable estradiol: concentration in mg/mL
+ * For progesterone: standard dose equivalent (treated as mg/1 unit for calculation purposes)
  *
  * These are common pharmaceutical concentrations for injectable estradiol esters.
+ * Progesterone uses standard oral/rectal/vaginal doses.
  * Users can override these in the settings modal.
  */
 export const DEFAULT_ESTER_CONCENTRATIONS: Record<string, number> = {
+  // Estradiol esters (mg/mL for injections)
   'Estradiol benzoate': 40,
   'Estradiol valerate': 40,
   'Estradiol cypionate': 40,
@@ -12,6 +17,12 @@ export const DEFAULT_ESTER_CONCENTRATIONS: Record<string, number> = {
   'Estradiol enanthate': 40,
   'Estradiol undecylate': 80,
   'Polyestradiol phosphate': 40,
+
+  // Progesterone (mg per unit dose)
+  // For progesterone, we treat 1 "unit" as the standard dose
+  'Progesterone (oral)': 100,     // Standard: 100-200mg
+  'Progesterone (rectal)': 100,   // Standard: 100-200mg
+  'Progesterone (vaginal)': 100,  // Standard: 100-200mg
 } as const;
 
 /**

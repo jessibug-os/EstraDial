@@ -285,7 +285,8 @@ export function generateReferenceCycle(
     if (referencePoint) {
       referenceData.push({
         day,
-        estradiol: referencePoint.estradiol
+        estradiol: referencePoint.estradiol,
+        progesterone: referencePoint.progesterone
       });
     } else {
       // Fallback interpolation if exact day not found
@@ -295,7 +296,8 @@ export function generateReferenceCycle(
 
       referenceData.push({
         day,
-        estradiol: closestPoint.estradiol
+        estradiol: closestPoint.estradiol,
+        progesterone: closestPoint.progesterone
       });
     }
   }
